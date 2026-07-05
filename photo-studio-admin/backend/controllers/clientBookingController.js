@@ -1,0 +1,82 @@
+const Booking = require('../models/Booking');
+const generateTrackingNumber = require('../utils/generateTrackingNumber');
+const asyncHandler = require('../utils/asyncHandler');
+const ApiError = require('../utils/ApiError');
+const { sendSuccess } = require('../utils/apiResponse');
+
+function normalizePhone(value) {
+  return String(value || '').replace(/\D/g, '');
+}
+
+function safeTrackingView(booking) {
+  return {
+    trackingNumber: booking.trackingNumber,
+    approvalStatus: booking.approvalStatus,
+    personalDetails: {
+      fullName: booking.personalDetails.fullName,
+    },
+    eventDetails: booking.eventDetails,
+    currentStage: booking.currentStage,
+    projectTimeline: booking.projectTimeline,
+    estimatedDeliveryDate: booking.estimatedDeliveryDate,
+    createdAt: booking.createdAt,
+    updatedAt: booking.updatedAt,
+  };
+}
+
+// @route POST /api/client/bookings
+const createClientBooking = asyncHandler(async (req, res) => {
+  const trackingNumber = await generateTrackingNumber();
+  const booking = await Booking.create({
+    trackingNumber,
+    approvalStatus: 'Pending',
+    personalDetails: {
+      fullName: req.body.fullName,
+      phoneNumber: normalizePhone(req.body.phoneNumber),
+      emailAddress: req.body.emailAddress || '',
+      instagram: req.body.instagram || '',
+    },
+    eventDetails: {
+      shootType: req.body.shootType,
+      eventDate: req.body.eventDate,
+      eventTime: req.body.eventTime || '',
+      venueName: req.body.venueName || '',
+      venueAddress: req.body.venueAddress || '',
+    },
+    package: {
+      type: 'Custom',
+      customDescription: 'To be assigned by the studio after approval',
+    },
+    payment: { totalAmount: 0, advancePayment: 0 },
+  });
+
+  return sendSuccess(res, {
+    statusCode: 201,
+    message: 'Booking request received and awaiting studio approval',
+    data: {
+      trackingNumber: booking.trackingNumber,
+      approvalStatus: booking.approvalStatus,
+      eventDate: booking.eventDetails.eventDate,
+    },
+  });
+});
+
+// POST avoids putting the phone number into URLs, browser history, and logs.
+// @route POST /api/client/bookings/track
+const trackClientBooking = asyncHandler(async (req, res) => {
+  const booking = await Booking.findOne({
+    trackingNumber: req.body.trackingNumber.toUpperCase(),
+  });
+
+  // Use one generic response so callers cannot enumerate valid tracking IDs.
+  if (!booking || normalizePhone(booking.personalDetails.phoneNumber) !== normalizePhone(req.body.phoneNumber)) {
+    throw new ApiError(404, 'Booking not found. Check the tracking ID and phone number.');
+  }
+
+  return sendSuccess(res, {
+    message: 'Booking status fetched successfully',
+    data: safeTrackingView(booking),
+  });
+});
+
+module.exports = { createClientBooking, trackClientBooking };

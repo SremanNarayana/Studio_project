@@ -1,0 +1,212 @@
+/* ==========================================================================
+   DESIGN TOKENS
+   Palette: deep navy (authority/archival), warm gold (the "developed print"
+   accent), warm paper background with a faint blueprint grid - it reads like
+   a studio's contact-sheet ledger rather than a generic SaaS dashboard.
+   Display type: Playfair Display (the same elegant serif a studio would put
+   on a wedding album cover). Body/UI type: Inter. Data/tracking numbers:
+   JetBrains Mono, so a code like MP-26-001 reads like a negative/frame id.
+   ========================================================================== */
+
+:root {
+  --navy-900: #0a1f3d;
+  --navy-800: #0f2a52;
+  --navy-700: #16345f;
+  --gold-500: #c9a227;
+  --gold-400: #d9b64a;
+  --gold-100: #f6ecc9;
+  --paper: #f6f4ee;
+  --paper-grid: #eae6da;
+  --white: #ffffff;
+  --ink-900: #16213e;
+  --ink-600: #52586b;
+  --ink-400: #8b8f9e;
+  --line: #e6e2d6;
+
+  --success: #1f8a5f;
+  --success-bg: #e6f4ec;
+  --warning: #b5790a;
+  --warning-bg: #fbf0d9;
+  --danger: #b3352c;
+  --danger-bg: #f8e6e4;
+  --info: #2f5aa8;
+  --info-bg: #e8eefa;
+
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --shadow-card: 0 1px 2px rgba(10, 31, 61, 0.04), 0 8px 24px rgba(10, 31, 61, 0.06);
+  --shadow-pop: 0 20px 45px rgba(10, 31, 61, 0.18);
+
+  --font-display: 'Playfair Display', Georgia, serif;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Courier New', monospace;
+
+  --sidebar-w: 260px;
+}
+
+* { box-sizing: border-box; }
+
+html, body, #root { height: 100%; }
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  color: var(--ink-900);
+  background: var(--paper);
+  -webkit-font-smoothing: antialiased;
+}
+
+button, input, select, textarea { font-family: inherit; }
+
+a { color: inherit; text-decoration: none; }
+
+/* Faint architectural grid used behind main content, echoing the reference
+   screens - kept subtle so it never competes with real content. */
+.grid-backdrop {
+  background-image:
+    linear-gradient(var(--paper-grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--paper-grid) 1px, transparent 1px);
+  background-size: 40px 40px;
+  background-position: -1px -1px;
+}
+
+/* ---------- Eyebrow pill (e.g. "LIVE OVERVIEW", "BOOKINGS") ---------- */
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  background: var(--navy-900);
+  color: var(--gold-100);
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+/* ---------- Page heading ---------- */
+.page-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--navy-900);
+  margin: 14px 0 4px;
+  line-height: 1.1;
+}
+
+.page-subtitle {
+  color: var(--ink-600);
+  font-size: 14px;
+  margin: 0;
+}
+
+/* ---------- Cards ---------- */
+.card {
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+}
+
+/* ---------- Buttons ---------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 11px 20px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, opacity 0.12s ease;
+}
+.btn:active { transform: translateY(1px); }
+.btn:disabled { opacity: 0.55; cursor: not-allowed; }
+
+.btn-primary { background: var(--navy-900); color: var(--white); }
+.btn-primary:hover:not(:disabled) { background: var(--navy-800); }
+
+.btn-gold { background: var(--gold-500); color: var(--navy-900); }
+.btn-gold:hover:not(:disabled) { background: var(--gold-400); }
+
+.btn-ghost { background: transparent; color: var(--navy-900); border: 1px solid var(--line); }
+.btn-ghost:hover:not(:disabled) { background: var(--paper); }
+
+.btn-danger { background: var(--danger); color: var(--white); }
+.btn-danger:hover:not(:disabled) { opacity: 0.9; }
+
+.btn-sm { padding: 7px 14px; font-size: 12.5px; }
+
+/* ---------- Form elements ---------- */
+.field-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-600);
+  margin-bottom: 8px;
+}
+
+.field-input, .field-select, .field-textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--paper);
+  font-size: 14px;
+  color: var(--ink-900);
+  outline: none;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+.field-input:focus, .field-select:focus, .field-textarea:focus {
+  border-color: var(--gold-500);
+  background: var(--white);
+}
+.field-error { color: var(--danger); font-size: 12px; margin-top: 6px; }
+
+.checkbox-row, .radio-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--paper);
+  cursor: pointer;
+  font-size: 13.5px;
+}
+.checkbox-row input, .radio-row input { accent-color: var(--navy-900); }
+
+/* ---------- Status badges ---------- */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 11px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+.badge-success { background: var(--success-bg); color: var(--success); }
+.badge-warning { background: var(--warning-bg); color: var(--warning); }
+.badge-danger { background: var(--danger-bg); color: var(--danger); }
+.badge-info { background: var(--info-bg); color: var(--info); }
+.badge-neutral { background: var(--paper-grid); color: var(--ink-600); }
+
+/* ---------- Tracking number mono style ---------- */
+.tracking-no { font-family: var(--font-mono); letter-spacing: 0.02em; font-weight: 600; }
+
+/* ---------- Scrollbar (subtle) ---------- */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-thumb { background: var(--paper-grid); border-radius: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+
+@media (max-width: 900px) {
+  :root { --sidebar-w: 0px; }
+}

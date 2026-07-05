@@ -1,0 +1,12 @@
+{
+  "name": "photo-studio-admin",
+  "version": "1.0.0",
+  "description": "Admin-only dashboard for managing bookings, payments, and project stages for a photography studio. Built so a client-facing portal can be added later without touching this codebase.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
