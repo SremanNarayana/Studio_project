@@ -1,6 +1,5 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import malayaanLogo from '../assets/malayaan-logo.png';
 
 const NAV_ITEMS = [
   { to: '/', label: 'Dashboard', icon: '◧', end: true },
@@ -26,20 +25,7 @@ export default function Sidebar() {
         height: '100vh',
       }}
     >
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '0 8px 30px' }}>
-        <img
-          src={malayaanLogo}
-          alt="Malayaan Photography logo"
-          style={{
-            width: 50,
-            height: 50,
-            borderRadius: 12,
-            objectFit: 'cover',
-            background: 'rgba(255,255,255,0.92)',
-            padding: 4,
-            boxShadow: '0 10px 26px rgba(0,0,0,0.16)',
-          }}
-        />
+      <div style={{ padding: '0 8px 30px' }}>
         <div>
           <div style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 15, lineHeight: 1.1 }}>
             Malayaan Photography
