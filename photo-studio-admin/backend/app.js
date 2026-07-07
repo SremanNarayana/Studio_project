@@ -6,6 +6,7 @@ const bookingRoutes = require('./routes/bookingRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
 const clientBookingRoutes = require('./routes/clientBookingRoutes');
 const settingsRoutes = require('./routes/settingsRoutes');
+const analyticsRoutes = require('./routes/analyticsRoutes');
 const { errorHandler, notFound } = require('./middleware/errorHandler');
 
 const app = express();
@@ -41,6 +42,7 @@ app.use('/api/bookings', bookingRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/client/bookings', clientBookingRoutes);
 app.use('/api/settings', settingsRoutes);
+app.use('/api/analytics', analyticsRoutes);
 
 // ---------- 404 + error handling (must be last) ----------
 app.use(notFound);

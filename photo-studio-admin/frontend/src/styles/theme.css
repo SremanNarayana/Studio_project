@@ -202,6 +202,13 @@ a { color: inherit; text-decoration: none; }
 /* ---------- Tracking number mono style ---------- */
 .tracking-no { font-family: var(--font-mono); letter-spacing: 0.02em; font-weight: 600; }
 
+.analytics-primary-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.7fr) minmax(280px, 1fr);
+  gap: 20px;
+  align-items: stretch;
+}
+
 /* ---------- Scrollbar (subtle) ---------- */
 ::-webkit-scrollbar { width: 8px; height: 8px; }
 ::-webkit-scrollbar-thumb { background: var(--paper-grid); border-radius: 8px; }
@@ -209,4 +216,5 @@ a { color: inherit; text-decoration: none; }
 
 @media (max-width: 900px) {
   :root { --sidebar-w: 0px; }
+  .analytics-primary-grid { grid-template-columns: 1fr; }
 }

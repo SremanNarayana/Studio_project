@@ -5,6 +5,7 @@ const NAV_ITEMS = [
   { to: '/', label: 'Dashboard', icon: '◧', end: true },
   { to: '/bookings', label: 'Bookings', icon: '◨' },
   { to: '/bookings/new', label: 'New Booking', icon: '＋' },
+  { to: '/analytics', label: 'Analytics', icon: '↗' },
   { to: '/settings', label: 'Settings', icon: '⚙' },
 ];
 

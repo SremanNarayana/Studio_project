@@ -6,6 +6,7 @@ import BookingList from './pages/BookingList.jsx';
 import BookingForm from './pages/BookingForm.jsx';
 import BookingDetails from './pages/BookingDetails.jsx';
 import Settings from './pages/Settings.jsx';
+import Analytics from './pages/Analytics.jsx';
 
 export default function App() {
   return (
@@ -16,6 +17,7 @@ export default function App() {
         <Route path="/bookings/new" element={<BookingForm />} />
         <Route path="/bookings/:id/edit" element={<BookingForm />} />
         <Route path="/bookings/:id" element={<BookingDetails />} />
+        <Route path="/analytics" element={<Analytics />} />
         <Route path="/settings" element={<Settings />} />
       </Routes>
     </AdminLayout>
