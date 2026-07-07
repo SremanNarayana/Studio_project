@@ -21,7 +21,7 @@ async function getSmsSettings() {
     { new: true, upsert: true, setDefaultsOnInsert: true }
   );
   if (!settings.bookingMessageTemplate) {
-    settings.bookingMessageTemplate = 'Momento Frames: Your booking is confirmed. Booking ID: {{trackingId}}. Use this ID on our website to track your project.';
+    settings.bookingMessageTemplate = 'Malayaan Photography: Your booking is confirmed. Booking ID: {{trackingId}}. Use this ID on our website to track your project.';
     await settings.save();
   }
   return settings;

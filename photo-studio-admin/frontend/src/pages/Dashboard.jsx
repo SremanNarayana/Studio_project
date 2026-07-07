@@ -35,7 +35,7 @@ export default function Dashboard() {
     <div>
       <span className="eyebrow">◧ Live Overview</span>
       <h1 className="page-title" style={{ fontSize: 34 }}>Welcome back, Admin</h1>
-      <p className="page-subtitle">Every booking, shoot, and delivery in Momento Frames at a glance.</p>
+      <p className="page-subtitle">Every booking, shoot, and delivery in Malayaan Photography at a glance.</p>
 
       <div
         style={{

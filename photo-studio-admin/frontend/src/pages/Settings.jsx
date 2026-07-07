@@ -20,7 +20,7 @@ export default function Settings() {
   useEffect(() => {
     settingsService.getSms().then((res) => {
       const s = res.data;
-      setForm({ enabled: s.enabled, templateId: s.templateId || '', bookingTemplateId: s.bookingTemplateId || '', messageTemplate: s.messageTemplate, bookingMessageTemplate: s.bookingMessageTemplate || 'Momento Frames: Your booking is confirmed. Booking ID: {{trackingId}}. Use this ID on our website to track your project.', trackingBaseUrl: s.trackingBaseUrl });
+      setForm({ enabled: s.enabled, templateId: s.templateId || '', bookingTemplateId: s.bookingTemplateId || '', messageTemplate: s.messageTemplate, bookingMessageTemplate: s.bookingMessageTemplate || 'Malayaan Photography: Your booking is confirmed. Booking ID: {{trackingId}}. Use this ID on our website to track your project.', trackingBaseUrl: s.trackingBaseUrl });
       setAuthKeyConfigured(s.authKeyConfigured);
     }).catch((err) => showToast(err.message, 'error')).finally(() => setLoading(false));
   }, []); // eslint-disable-line react-hooks/exhaustive-deps

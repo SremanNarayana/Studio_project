@@ -1,5 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
+import malayaanLogo from '../assets/malayaan-logo.png';
 
 const NAV_ITEMS = [
   { to: '/', label: 'Dashboard', icon: '◧', end: true },
@@ -26,26 +27,22 @@ export default function Sidebar() {
       }}
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '0 8px 30px' }}>
-        <div
+        <img
+          src={malayaanLogo}
+          alt="Malayaan Photography logo"
           style={{
-            width: 34,
-            height: 34,
-            borderRadius: 9,
-            background: 'var(--gold-500)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontFamily: 'var(--font-display)',
-            fontWeight: 700,
-            color: 'var(--navy-900)',
-            fontSize: 16,
+            width: 50,
+            height: 50,
+            borderRadius: 12,
+            objectFit: 'cover',
+            background: 'rgba(255,255,255,0.92)',
+            padding: 4,
+            boxShadow: '0 10px 26px rgba(0,0,0,0.16)',
           }}
-        >
-          MP
-        </div>
+        />
         <div>
           <div style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 15, lineHeight: 1.1 }}>
-            Momento Frames
+            Malayaan Photography
           </div>
           <div style={{ fontSize: 11, color: 'var(--gold-100)', opacity: 0.7 }}>Studio Admin</div>
         </div>
@@ -102,7 +99,7 @@ export default function Sidebar() {
         </div>
         <div>
           <div style={{ fontSize: 13, fontWeight: 600 }}>Admin</div>
-          <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.55)' }}>admin@momentoframes.in</div>
+          <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.55)' }}>Malayaan Photography</div>
         </div>
       </div>
     </aside>
