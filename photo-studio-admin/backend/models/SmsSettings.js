@@ -5,6 +5,11 @@ const smsSettingsSchema = new mongoose.Schema({
   enabled: { type: Boolean, default: false },
   provider: { type: String, enum: ['msg91'], default: 'msg91' },
   templateId: { type: String, trim: true, default: '' },
+  bookingTemplateId: { type: String, trim: true, default: '' },
+  bookingMessageTemplate: {
+    type: String, trim: true, maxlength: 500,
+    default: 'Momento Frames: Your booking is confirmed. Booking ID: {{trackingId}}. Use this ID on our website to track your project.',
+  },
   messageTemplate: {
     type: String, trim: true, maxlength: 500,
     default: 'Momento Frames: Booking {{trackingId}} is now at {{stageName}}. Visit our website to track your project.',

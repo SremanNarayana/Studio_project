@@ -4,7 +4,7 @@ const asyncHandler = require('../utils/asyncHandler');
 const ApiError = require('../utils/ApiError');
 const { sendSuccess } = require('../utils/apiResponse');
 const { PROJECT_STAGES, STAGE_STATUS, APPROVAL_STATUS } = require('../config/constants');
-const { sendStageUpdateSms } = require('../services/smsService');
+const { sendStageUpdateSms, sendBookingCreatedSms } = require('../services/smsService');
 
 // @desc    Create a new booking (tracking number auto-generated)
 // @route   POST /api/bookings
@@ -14,12 +14,22 @@ const createBooking = asyncHandler(async (req, res) => {
   const booking = await Booking.create({
     ...req.body,
     trackingNumber,
+    approvalStatus: 'Approved',
   });
+
+  let sms;
+  try {
+    sms = await sendBookingCreatedSms(booking);
+  } catch (error) {
+    console.error(`Booking created but SMS failed for ${booking.trackingNumber}:`, error.message);
+    sms = { sent: false, mode: 'error', error: error.message };
+  }
 
   return sendSuccess(res, {
     statusCode: 201,
     message: 'Booking created successfully',
     data: booking,
+    meta: { sms },
   });
 });
 

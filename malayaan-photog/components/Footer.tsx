@@ -16,7 +16,6 @@ const quick = [
   { href: "/#services", label: "Services" },
   { href: "/#process", label: "Process" },
   { href: "/track", label: "Track My Project" },
-  { href: "/#contact", label: "Contact" },
 ];
 
 const insta = [

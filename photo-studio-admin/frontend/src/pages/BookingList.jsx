@@ -95,6 +95,7 @@ export default function BookingList() {
             {new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
           </p>
         </div>
+        <Link to="/bookings/new" className="btn btn-gold">+ New Booking</Link>
       </div>
 
       {/* Search + filters */}

@@ -12,7 +12,6 @@ const links = [
   { href: "/packages", label: "Packages" },
   { href: "/#about", label: "About" },
   { href: "/track", label: "Track My Project" },
-  { href: "/#contact", label: "Contact" },
 ];
 
 export function Navigation() {
@@ -61,10 +60,10 @@ export function Navigation() {
             </nav>
 
             <Link
-              href="/#contact"
+              href="/track"
               className="hidden lg:inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-gold-400/60 text-gold-300 text-[9px] sm:text-[10px] uppercase tracking-[0.2em] hover:bg-gold-400 hover:text-ink-950 transition-all"
             >
-              Book Now
+              Track Project
             </Link>
 
             <button

@@ -212,34 +212,20 @@ export function Packages() {
 
               {/* CTA */}
               <Link
-                href="/#contact"
+                href="/track"
                 className={`group/btn inline-flex items-center justify-center gap-2 w-full px-6 py-3.5 rounded-full text-sm font-medium tracking-[0.15em] uppercase transition-all duration-300 ${
                   p.featured
                     ? "bg-gradient-to-r from-gold-500 to-gold-300 text-ink-950 hover:shadow-[0_12px_30px_-8px_rgba(214,185,119,0.7)]"
                     : "border border-black/15 text-ivory-50 hover:border-gold-500 hover:bg-gold-400/5"
                 }`}
               >
-                Enquire Now
+                Track Project
                 <ArrowRight className="h-4 w-4 transition-transform group-hover/btn:translate-x-1" />
               </Link>
             </motion.div>
           ))}
         </div>
 
-        {/* Footnote */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          className="text-center mt-12"
-        >
-          <p className="text-sm text-ivory-200 font-light">
-            Need maternity, baby or pre-wedding only?{" "}
-            <Link href="/#contact" className="text-gold-600 hover:text-gold-500 underline underline-offset-4 decoration-gold-400/40">
-              Let&rsquo;s build a custom collection
-            </Link>
-          </p>
-        </motion.div>
       </div>
     </section>
   );

@@ -68,9 +68,8 @@ const trackClientBooking = asyncHandler(async (req, res) => {
     trackingNumber: req.body.trackingNumber.toUpperCase(),
   });
 
-  // Use one generic response so callers cannot enumerate valid tracking IDs.
-  if (!booking || normalizePhone(booking.personalDetails.phoneNumber) !== normalizePhone(req.body.phoneNumber)) {
-    throw new ApiError(404, 'Booking not found. Check the tracking ID and phone number.');
+  if (!booking) {
+    throw new ApiError(404, 'Booking not found. Check the booking ID.');
   }
 
   return sendSuccess(res, {

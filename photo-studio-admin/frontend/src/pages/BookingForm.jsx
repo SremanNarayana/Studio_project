@@ -72,7 +72,8 @@ export default function BookingForm() {
         showToast('Booking updated successfully', 'success');
       } else {
         const res = await bookingService.create(form);
-        showToast(`Booking ${res.data.trackingNumber} created successfully`, 'success');
+        const smsText = res.meta?.sms?.sent ? ' · Booking ID sent by SMS' : ' · SMS not sent';
+        showToast(`Booking ${res.data.trackingNumber} created successfully${smsText}`, res.meta?.sms?.sent ? 'success' : 'error');
       }
       navigate('/bookings');
     } catch (err) {

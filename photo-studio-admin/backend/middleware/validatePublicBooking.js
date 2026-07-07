@@ -42,7 +42,6 @@ const validatePublicBooking = [
 
 const validateTrackingLookup = [
   body('trackingNumber').isString().trim().matches(/^MP-\d{2}-\d{3,}$/i).withMessage('Invalid tracking ID'),
-  body('phoneNumber').isString().trim().matches(/^\+?[0-9 ()-]{7,20}$/).withMessage('Phone number looks invalid'),
   handleValidation,
 ];
 

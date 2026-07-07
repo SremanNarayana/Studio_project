@@ -5,11 +5,10 @@ const API_TIMEOUT_MS = 10_000;
 export async function POST(req: Request) {
   const body = await req.json().catch(() => null);
   const trackingNumber = body?.trackingNumber ?? body?.tracking_number;
-  const phoneNumber = body?.phoneNumber ?? body?.phone;
 
-  if (!trackingNumber?.trim() || !phoneNumber?.trim()) {
+  if (!trackingNumber?.trim()) {
     return NextResponse.json(
-      { error: "Both Tracking ID and Phone Number are required." },
+      { error: "Booking ID is required." },
       { status: 400 }
     );
   }
@@ -24,7 +23,7 @@ export async function POST(req: Request) {
     const response = await fetch(`${apiUrl}/api/client/bookings/track`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ trackingNumber: trackingNumber.trim(), phoneNumber: phoneNumber.trim() }),
+      body: JSON.stringify({ trackingNumber: trackingNumber.trim() }),
       cache: "no-store",
       signal: AbortSignal.timeout(API_TIMEOUT_MS),
     });

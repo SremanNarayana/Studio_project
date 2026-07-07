@@ -9,16 +9,18 @@ const getSettings = asyncHandler(async (_req, res) => {
 });
 
 const updateSettings = asyncHandler(async (req, res) => {
-  const { enabled, templateId, messageTemplate, trackingBaseUrl } = req.body;
+  const { enabled, templateId, bookingTemplateId, messageTemplate, bookingMessageTemplate, trackingBaseUrl } = req.body;
   if (typeof enabled !== 'boolean') throw new ApiError(400, 'enabled must be true or false');
   if (!messageTemplate || messageTemplate.length > 500) throw new ApiError(400, 'Message template is required and must be at most 500 characters');
+  if (!bookingMessageTemplate || bookingMessageTemplate.length > 500) throw new ApiError(400, 'Booking message template is required and must be at most 500 characters');
   if (!trackingBaseUrl || !/^https?:\/\//i.test(trackingBaseUrl)) throw new ApiError(400, 'Tracking URL must start with http:// or https://');
-  const unknown = [...messageTemplate.matchAll(/{{\s*([a-zA-Z]+)\s*}}/g)].map((m) => m[1]).filter((name) => !ALLOWED_VARIABLES.includes(name));
+  const unknown = [...`${messageTemplate} ${bookingMessageTemplate}`.matchAll(/{{\s*([a-zA-Z]+)\s*}}/g)].map((m) => m[1]).filter((name) => !ALLOWED_VARIABLES.includes(name));
   if (unknown.length) throw new ApiError(400, `Unknown SMS variable: ${unknown[0]}`);
   if (enabled && !templateId?.trim()) throw new ApiError(400, 'MSG91 Template ID is required before enabling SMS');
+  if (enabled && !bookingTemplateId?.trim()) throw new ApiError(400, 'MSG91 Booking Template ID is required before enabling SMS');
 
   const settings = await getSmsSettings();
-  Object.assign(settings, { enabled, templateId: templateId?.trim() || '', messageTemplate: messageTemplate.trim(), trackingBaseUrl: trackingBaseUrl.trim().replace(/\/$/, '') });
+  Object.assign(settings, { enabled, templateId: templateId?.trim() || '', bookingTemplateId: bookingTemplateId?.trim() || '', messageTemplate: messageTemplate.trim(), bookingMessageTemplate: bookingMessageTemplate.trim(), trackingBaseUrl: trackingBaseUrl.trim().replace(/\/$/, '') });
   await settings.save();
   return sendSuccess(res, { message: 'SMS settings saved', data: settings });
 });

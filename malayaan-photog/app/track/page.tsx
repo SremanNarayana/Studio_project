@@ -8,7 +8,6 @@ import type { PublicBooking } from "@/lib/types";
 
 export default function TrackPage() {
   const [trackingNumber, setTrackingNumber] = useState("");
-  const [phone, setPhone] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [booking, setBooking] = useState<PublicBooking | null>(null);
@@ -25,7 +24,7 @@ export default function TrackPage() {
       const res = await fetch("/api/track", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ trackingNumber, phoneNumber: phone }),
+        body: JSON.stringify({ trackingNumber }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -50,7 +49,6 @@ export default function TrackPage() {
             onBack={() => {
               setBooking(null);
               setTrackingNumber("");
-              setPhone("");
             }}
           />
         </div>
@@ -82,7 +80,7 @@ export default function TrackPage() {
             Track Your <span className="italic gold-text">Project</span>
           </h1>
           <p className="text-ivory-100/55 font-light">
-            Enter your details to view live progress.
+            Enter your booking ID to view live progress.
           </p>
         </div>
 
@@ -92,13 +90,6 @@ export default function TrackPage() {
             value={trackingNumber}
             onChange={setTrackingNumber}
             placeholder="MP-26-001"
-          />
-          <FloatingInput
-            label="Phone Number"
-            value={phone}
-            onChange={setPhone}
-            placeholder="+91 98765 43210"
-            type="tel"
           />
 
           <button
@@ -131,12 +122,6 @@ export default function TrackPage() {
           </AnimatePresence>
         </form>
 
-        <div className="mt-4 text-center text-xs text-ivory-100/40">
-          No tracking number?{" "}
-          <a href="/#contact" className="text-gold-600 hover:text-gold-200">
-            Contact us
-          </a>
-        </div>
       </motion.div>
     </div>
   );

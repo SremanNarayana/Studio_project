@@ -3,7 +3,6 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { Plus, MessageCircle } from "lucide-react";
 import { useState } from "react";
-import Link from "next/link";
 import { FAQS } from "@/lib/seo";
 
 export function FAQ() {
@@ -39,9 +38,6 @@ export function FAQ() {
               Still have a question? We&rsquo;d love to help.
             </div>
             <div className="flex flex-wrap gap-3">
-              <Link href="/#contact" className="btn-primary">
-                Ask Us Anything
-              </Link>
               <a
                 href="https://wa.me/917708113657"
                 target="_blank"

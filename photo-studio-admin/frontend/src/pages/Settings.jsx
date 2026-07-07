@@ -13,25 +13,28 @@ export default function Settings() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [authKeyConfigured, setAuthKeyConfigured] = useState(false);
-  const [form, setForm] = useState({ enabled: false, templateId: '', messageTemplate: '', trackingBaseUrl: '' });
+  const [form, setForm] = useState({ enabled: false, templateId: '', bookingTemplateId: '', messageTemplate: '', bookingMessageTemplate: '', trackingBaseUrl: '' });
   const templateRef = useRef(null);
+  const bookingTemplateRef = useRef(null);
 
   useEffect(() => {
     settingsService.getSms().then((res) => {
       const s = res.data;
-      setForm({ enabled: s.enabled, templateId: s.templateId || '', messageTemplate: s.messageTemplate, trackingBaseUrl: s.trackingBaseUrl });
+      setForm({ enabled: s.enabled, templateId: s.templateId || '', bookingTemplateId: s.bookingTemplateId || '', messageTemplate: s.messageTemplate, bookingMessageTemplate: s.bookingMessageTemplate || 'Momento Frames: Your booking is confirmed. Booking ID: {{trackingId}}. Use this ID on our website to track your project.', trackingBaseUrl: s.trackingBaseUrl });
       setAuthKeyConfigured(s.authKeyConfigured);
     }).catch((err) => showToast(err.message, 'error')).finally(() => setLoading(false));
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const preview = useMemo(() => form.messageTemplate.replace(/{{\s*([a-zA-Z]+)\s*}}/g, (m, key) => SAMPLE[key] ?? m), [form.messageTemplate]);
+  const bookingPreview = useMemo(() => form.bookingMessageTemplate.replace(/{{\s*([a-zA-Z]+)\s*}}/g, (m, key) => SAMPLE[key] ?? m), [form.bookingMessageTemplate]);
   const set = (key, value) => setForm((current) => ({ ...current, [key]: value }));
-  const insertVariable = (name) => {
+  const insertVariable = (name, field = 'messageTemplate', ref = templateRef) => {
     const token = `{{${name}}}`;
-    const el = templateRef.current;
-    const start = el?.selectionStart ?? form.messageTemplate.length;
+    const el = ref.current;
+    const value = form[field];
+    const start = el?.selectionStart ?? value.length;
     const end = el?.selectionEnd ?? start;
-    set('messageTemplate', `${form.messageTemplate.slice(0, start)}${token}${form.messageTemplate.slice(end)}`);
+    set(field, `${value.slice(0, start)}${token}${value.slice(end)}`);
     requestAnimationFrame(() => { el?.focus(); el?.setSelectionRange(start + token.length, start + token.length); });
   };
   const save = async (event) => {
@@ -57,8 +60,11 @@ export default function Settings() {
           </span>
         </label>
 
-        <Field label="MSG91 Template ID">
+        <Field label="MSG91 Stage-update Template ID">
           <input className="input" value={form.templateId} onChange={(e) => set('templateId', e.target.value)} placeholder="Your approved MSG91 flow/template ID" />
+        </Field>
+        <Field label="MSG91 Booking-created Template ID">
+          <input className="input" value={form.bookingTemplateId} onChange={(e) => set('bookingTemplateId', e.target.value)} placeholder="Approved MSG91 template that sends the booking ID" />
         </Field>
         <Field label="Public tracking page URL">
           <input className="input" value={form.trackingBaseUrl} onChange={(e) => set('trackingBaseUrl', e.target.value)} placeholder="https://your-site.com/track" />
@@ -74,6 +80,16 @@ export default function Settings() {
         <div style={{ padding: 16, background: 'var(--gold-100)', borderRadius: 10, marginBottom: 20 }}>
           <strong style={{ fontSize: 12 }}>Preview</strong>
           <p style={{ margin: '7px 0 0', lineHeight: 1.6 }}>{preview}</p>
+        </div>
+        <Field label="New booking SMS template">
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 9 }}>
+            {['clientName', 'trackingId', 'trackingUrl'].map((name) => <button key={name} type="button" className="btn btn-ghost btn-sm" onClick={() => insertVariable(name, 'bookingMessageTemplate', bookingTemplateRef)}>{`{{${name}}}`}</button>)}
+          </div>
+          <textarea ref={bookingTemplateRef} className="input" rows={4} maxLength={500} value={form.bookingMessageTemplate} onChange={(e) => set('bookingMessageTemplate', e.target.value)} />
+        </Field>
+        <div style={{ padding: 16, background: 'var(--gold-100)', borderRadius: 10, marginBottom: 20 }}>
+          <strong style={{ fontSize: 12 }}>New booking preview</strong>
+          <p style={{ margin: '7px 0 0', lineHeight: 1.6 }}>{bookingPreview}</p>
         </div>
         <p style={{ fontSize: 12.5, color: 'var(--ink-600)', lineHeight: 1.6 }}>
           India DLT rule: the production text and variables must match the approved MSG91/DLT template. Editing here changes the preview; update the approved template and Template ID when its structure changes. DLT commonly permits only 1–2 variables.
