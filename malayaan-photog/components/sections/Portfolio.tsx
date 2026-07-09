@@ -7,21 +7,21 @@ import { X, ChevronLeft, ChevronRight } from "lucide-react";
 type Item = { src: string; category: string; title: string; span?: string };
 
 const items: Item[] = [
-  { src: "https://images.unsplash.com/photo-1519741497674-611481863552?w=1200&q=85", category: "Weddings", title: "Sangeetha & Karthik", span: "row-span-2" },
-  { src: "https://images.unsplash.com/photo-1591604466107-ec97de577aff?w=900&q=85", category: "Couples", title: "Golden Hour" },
-  { src: "https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=900&q=85", category: "Maternity", title: "Awaiting Joy" },
-  { src: "https://images.unsplash.com/photo-1606216794074-735e91aa2c92?w=900&q=85", category: "Weddings", title: "Temple Vows", span: "col-span-2" },
-  { src: "https://images.unsplash.com/photo-1537633552985-df8429e8048b?w=900&q=85", category: "Family", title: "Three Generations" },
-  { src: "https://images.unsplash.com/photo-1525258946800-98cfd641d0de?w=900&q=85", category: "Baby", title: "First Light" },
-  { src: "https://images.unsplash.com/photo-1591604466107-ec97de577aff?w=900&q=85", category: "Engagements", title: "She Said Yes", span: "row-span-2" },
-  { src: "https://images.unsplash.com/photo-1606216841078-d2ab19890b85?w=900&q=85", category: "Traditional", title: "Heritage" },
-  { src: "https://images.unsplash.com/photo-1532712938310-34cb3982ef74?w=900&q=85", category: "Weddings", title: "The First Look" },
-  { src: "https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=900&q=85", category: "Couples", title: "Coastline" },
-  { src: "https://images.unsplash.com/photo-1573497019418-b400bb3ab074?w=900&q=85", category: "Maternity", title: "Soft Lines" },
-  { src: "https://images.unsplash.com/photo-1494774157365-9e04c6720e47?w=900&q=85", category: "Traditional", title: "The Tying" },
+  { src: "/portfolio-01.jpg", category: "Weddings", title: "Sacred Beginnings", span: "row-span-2" },
+  { src: "/portfolio-02.jpg", category: "Couples", title: "Golden Hour" },
+  { src: "/portfolio-03.jpg", category: "Traditional", title: "Timeless Grace" },
+  { src: "/portfolio-04.jpg", category: "Weddings", title: "Temple Vows", span: "col-span-2" },
+  { src: "/portfolio-05.jpg", category: "Couples", title: "Twilight Embrace" },
+  { src: "/portfolio-06.jpg", category: "Weddings", title: "Together Forever" },
+  { src: "/portfolio-07.jpg", category: "Engagements", title: "She Said Yes", span: "row-span-2" },
+  { src: "/portfolio-09.jpg", category: "Traditional", title: "Heritage & Joy" },
+  { src: "/portfolio-10.jpg", category: "Weddings", title: "Bride Sneha" },
+  { src: "/portfolio-11.jpg", category: "Couples", title: "Sunset Romance" },
+  { src: "/portfolio-12.jpg", category: "Family", title: "Eternal Bond" },
+  { src: "/portfolio-13.jpg", category: "Weddings", title: "The First Kiss" },
 ];
 
-const categories = ["All", "Weddings", "Couples", "Engagements", "Maternity", "Baby", "Family", "Traditional"];
+const categories = ["All", "Weddings", "Couples", "Engagements", "Family", "Traditional"];
 
 export function Portfolio() {
   const [filter, setFilter] = useState("All");
@@ -138,7 +138,7 @@ export function Portfolio() {
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={filtered[lightbox].src.replace("w=900", "w=1800").replace("w=1200", "w=1800")}
+                src={filtered[lightbox].src}
                 alt={filtered[lightbox].title}
                 className="max-h-[85vh] w-auto object-contain rounded-sm"
               />

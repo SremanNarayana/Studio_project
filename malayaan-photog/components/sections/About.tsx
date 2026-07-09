@@ -59,8 +59,8 @@ export function About() {
           <div className="relative aspect-[4/5] overflow-hidden rounded-sm gold-border">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="https://images.unsplash.com/photo-1554080353-a576cf803bda?w=900&q=85"
-              alt="Founder portrait"
+              src="/about-photo.jpg"
+              alt="Wedding couple holding hands with garlands"
               className="h-full w-full object-cover"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-ink-950/60 to-transparent" />
