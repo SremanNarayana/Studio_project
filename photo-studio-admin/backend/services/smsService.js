@@ -1,6 +1,6 @@
 const SmsSettings = require('../models/SmsSettings');
 
-const ALLOWED_VARIABLES = ['clientName', 'trackingId', 'stageName', 'trackingUrl'];
+const ALLOWED_VARIABLES = ['clientName', 'trackingId', 'stageName', 'trackingUrl', 'paymentAmount', 'paymentDescription', 'paymentLine', 'totalPaid', 'balanceAmount', 'paymentStatus'];
 
 function normalizeIndianMobile(value) {
   const digits = String(value || '').replace(/\D/g, '');
@@ -58,9 +58,29 @@ async function sendWithMsg91({ settings, booking, templateId, messageTemplate, v
   return { sent: true, mode: 'msg91', requestId: result.request_id || result.requestId || null };
 }
 
-async function sendStageUpdateSms(booking, stageName) {
+async function sendStageUpdateSms(booking, stageName, paymentEntry = null) {
   const settings = await getSmsSettings();
-  return sendWithMsg91({ settings, booking, templateId: settings.templateId, messageTemplate: settings.messageTemplate, variables: { stageName }, logLabel: 'stage' });
+  const paymentAmount = paymentEntry
+    ? new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(paymentEntry.amount || 0)
+    : '';
+  const paymentDescription = paymentEntry?.description || '';
+  const paymentLine = paymentEntry ? `Payment received: ${paymentAmount} (${paymentDescription})` : '';
+  return sendWithMsg91({
+    settings,
+    booking,
+    templateId: settings.templateId,
+    messageTemplate: settings.messageTemplate,
+    variables: {
+      stageName,
+      paymentAmount,
+      paymentDescription,
+      paymentLine,
+      totalPaid: new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(booking.payment?.paidAmount || booking.payment?.advancePayment || 0),
+      balanceAmount: new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(booking.payment?.balancePayment || 0),
+      paymentStatus: booking.payment?.paymentStatus || 'Pending',
+    },
+    logLabel: 'stage',
+  });
 }
 
 async function sendBookingCreatedSms(booking) {

@@ -4,6 +4,9 @@ import { motion } from "framer-motion";
 import { ArrowLeft, Calendar, Check, Clock3, MapPin, MessageCircle } from "lucide-react";
 import type { PublicBooking } from "@/lib/types";
 
+const currency = (n: number) =>
+  new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 }).format(n || 0);
+
 export function TrackingDashboard({ booking, onBack }: { booking: PublicBooking; onBack: () => void }) {
   const pending = booking.approvalStatus === "Pending";
   const approved = booking.approvalStatus === "Approved";
@@ -32,7 +35,7 @@ export function TrackingDashboard({ booking, onBack }: { booking: PublicBooking;
 
         {pending && (
           <div className="mt-8 border border-amber-200 bg-amber-50/70 p-5 text-sm text-amber-900">
-            The studio is checking availability for your event. You can return here with the same tracking ID and phone number to see the decision.
+            The studio is checking availability for your event. You can return here with the same booking ID to see the decision.
           </div>
         )}
 
@@ -55,9 +58,42 @@ export function TrackingDashboard({ booking, onBack }: { booking: PublicBooking;
                   <span className={`mt-0.5 h-5 w-5 rounded-full flex items-center justify-center ${stage.status === "Completed" ? "bg-emerald-500 text-white" : stage.status === "In Progress" ? "bg-gold-500 text-white" : "bg-black/10"}`}>
                     {stage.status === "Completed" && <Check className="h-3 w-3" />}
                   </span>
-                  <div><p className="text-sm text-ivory-100">{stage.stageName}</p><p className="text-xs text-ivory-100/45">{stage.status}</p></div>
+                  <div>
+                    <p className="text-sm text-ivory-100">{stage.stageName}</p>
+                    <p className="text-xs text-ivory-100/45">{stage.status}</p>
+                    {stage.remarks ? <p className="mt-1 text-xs text-ivory-100/60 whitespace-pre-line">{stage.remarks}</p> : null}
+                  </div>
                 </div>
               ))}
+            </div>
+          </section>
+        )}
+
+        {booking.payment && (
+          <section className="mt-10 pt-8 border-t border-black/[0.08]">
+            <h2 className="text-[10px] uppercase tracking-[0.3em] text-ivory-100/70 mb-4">Payment summary</h2>
+            <div className="grid sm:grid-cols-3 gap-4">
+              <Info icon={Calendar} label="Total amount" value={currency(booking.payment.totalAmount)} />
+              <Info icon={Clock3} label="Paid so far" value={currency(booking.payment.paidAmount)} />
+              <Info icon={Check} label="Balance" value={currency(booking.payment.balancePayment)} />
+            </div>
+            <div className="mt-6">
+              <div className="text-[10px] uppercase tracking-[0.22em] text-ivory-100/40 mb-3">Payment history</div>
+              {booking.payment.paymentEntries?.length ? (
+                <div className="space-y-3">
+                  {booking.payment.paymentEntries.map((entry, index) => (
+                    <div key={`${entry.receivedOn || "payment"}-${index}`} className="border border-black/[0.08] bg-black/[0.025] p-4">
+                      <div className="flex items-center justify-between gap-3">
+                        <div className="text-sm text-ivory-100">{currency(entry.amount)}</div>
+                        <div className="text-xs text-ivory-100/45">{formatDate(entry.receivedOn)}</div>
+                      </div>
+                      <p className="mt-2 text-xs text-ivory-100/60">{entry.description}</p>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-ivory-100/55">No payments recorded yet.</p>
+              )}
             </div>
           </section>
         )}

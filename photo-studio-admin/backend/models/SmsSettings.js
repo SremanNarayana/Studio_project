@@ -12,7 +12,7 @@ const smsSettingsSchema = new mongoose.Schema({
   },
   messageTemplate: {
     type: String, trim: true, maxlength: 500,
-    default: 'Malayaan Photography: Booking {{trackingId}} is now at {{stageName}}. Visit our website to track your project.',
+    default: 'Malayaan Photography: Booking {{trackingId}} is now at {{stageName}}. {{paymentLine}} Total paid: {{totalPaid}}. Balance: {{balanceAmount}}. Track: {{trackingUrl}}',
   },
   trackingBaseUrl: { type: String, trim: true, default: 'http://localhost:3000/track' },
 }, { timestamps: true });

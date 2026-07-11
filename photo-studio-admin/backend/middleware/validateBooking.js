@@ -32,7 +32,10 @@ const bookingRules = (isUpdate = false) => {
       .withMessage('Invalid package'),
 
     body('payment.totalAmount').optional().isFloat({ min: 0 }).withMessage('Total amount must be a positive number'),
-    body('payment.advancePayment').optional().isFloat({ min: 0 }).withMessage('Advance payment must be a positive number'),
+    body('payment.paymentEntries').optional().isArray().withMessage('Payment entries must be an array'),
+    body('payment.paymentEntries.*.amount').optional().isFloat({ min: 0 }).withMessage('Payment amount must be a positive number'),
+    body('payment.paymentEntries.*.description').optional().trim().notEmpty().withMessage('Payment description is required'),
+    body('payment.paymentEntries.*.receivedOn').optional({ checkFalsy: true }).isISO8601().withMessage('Payment date must be valid'),
   ];
 };
 

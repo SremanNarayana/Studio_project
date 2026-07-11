@@ -10,6 +10,14 @@ import { useToast } from '../hooks/useToast.jsx';
 const currency = (n) =>
   new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(n || 0);
 
+function normalizePaymentEntries(payment = {}, fallbackDate) {
+  if (Array.isArray(payment.paymentEntries) && payment.paymentEntries.length > 0) return payment.paymentEntries;
+  if ((payment.advancePayment || 0) > 0) {
+    return [{ amount: payment.advancePayment, description: 'Previous payment', receivedOn: fallbackDate }];
+  }
+  return [];
+}
+
 export default function BookingDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -44,9 +52,11 @@ export default function BookingDetails() {
         status: draft.status,
         completedDate: draft.completedDate || null,
         remarks: draft.remarks,
+        paymentEntry: draft.paymentEntry,
       });
       setBooking(res.data);
-      if (res.meta?.sms?.sent) showToast(`"${stageName}" updated · SMS sent`, 'success');
+      const paymentText = draft.paymentEntry ? ' · payment recorded' : '';
+      if (res.meta?.sms?.sent) showToast(`"${stageName}" updated${paymentText} · SMS sent`, 'success');
       else if (res.meta?.sms?.mode === 'log-only') showToast(`"${stageName}" updated · SMS preview logged`, 'success');
       else showToast(`"${stageName}" updated · SMS could not be sent`, 'error');
     } catch (err) {
@@ -85,6 +95,7 @@ export default function BookingDetails() {
   if (!booking) return <p>Booking not found.</p>;
 
   const { personalDetails, eventDetails, package: pkg, payment, requirements, projectTimeline, currentStage } = booking;
+  const paymentEntries = normalizePaymentEntries(payment, booking.updatedAt || booking.createdAt);
 
   return (
     <div>
@@ -167,12 +178,32 @@ export default function BookingDetails() {
             <InfoGrid
               items={[
                 ['Total Amount', currency(payment.totalAmount)],
-                ['Advance Payment', currency(payment.advancePayment)],
+                ['Paid So Far', currency(payment.paidAmount ?? payment.advancePayment)],
                 ['Balance Payment', currency(payment.balancePayment)],
               ]}
             />
             <div style={{ marginTop: 14 }}>
               <StatusBadge status={payment.paymentStatus} />
+            </div>
+            <div style={{ marginTop: 18 }}>
+              <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--ink-400)', marginBottom: 10 }}>
+                Payment History
+              </div>
+              {paymentEntries.length === 0 ? (
+                <p style={{ fontSize: 13, color: 'var(--ink-400)', margin: 0 }}>No payments recorded yet.</p>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                  {paymentEntries.map((entry, index) => (
+                    <div key={`${entry.receivedOn || 'payment'}-${index}`} style={{ padding: 12, borderRadius: 10, background: 'var(--paper)', border: '1px solid var(--line)' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
+                        <strong style={{ color: 'var(--navy-900)' }}>{currency(entry.amount)}</strong>
+                        <span style={{ fontSize: 12, color: 'var(--ink-400)' }}>{entry.receivedOn ? new Date(entry.receivedOn).toLocaleDateString() : 'Date not set'}</span>
+                      </div>
+                      <div style={{ marginTop: 6, fontSize: 13.5, color: 'var(--ink-600)' }}>{entry.description}</div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
 

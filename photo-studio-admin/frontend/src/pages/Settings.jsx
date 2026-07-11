@@ -6,6 +6,12 @@ import { useToast } from '../hooks/useToast.jsx';
 const SAMPLE = {
   clientName: 'Ananya', trackingId: 'MP-26-001', stageName: 'Editing',
   trackingUrl: 'https://your-site.com/track?id=MP-26-001',
+  paymentAmount: '₹5,000',
+  paymentDescription: 'Advance payment',
+  paymentLine: 'Payment received: ₹5,000 (Advance payment)',
+  totalPaid: '₹10,000',
+  balanceAmount: '₹15,000',
+  paymentStatus: 'Partial',
 };
 
 export default function Settings() {

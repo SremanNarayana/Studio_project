@@ -9,6 +9,16 @@ function normalizePhone(value) {
 }
 
 function safeTrackingView(booking) {
+  const paymentEntries = booking.payment?.paymentEntries?.length
+    ? booking.payment.paymentEntries
+    : (booking.payment?.advancePayment || 0) > 0
+      ? [{
+          amount: booking.payment.advancePayment,
+          description: 'Previous payment',
+          receivedOn: booking.updatedAt || booking.createdAt,
+        }]
+      : [];
+
   return {
     trackingNumber: booking.trackingNumber,
     approvalStatus: booking.approvalStatus,
@@ -18,6 +28,13 @@ function safeTrackingView(booking) {
     eventDetails: booking.eventDetails,
     currentStage: booking.currentStage,
     projectTimeline: booking.projectTimeline,
+    payment: {
+      totalAmount: booking.payment?.totalAmount || 0,
+      paidAmount: booking.payment?.paidAmount ?? booking.payment?.advancePayment ?? 0,
+      balancePayment: booking.payment?.balancePayment || 0,
+      paymentStatus: booking.payment?.paymentStatus || 'Pending',
+      paymentEntries,
+    },
     estimatedDeliveryDate: booking.estimatedDeliveryDate,
     createdAt: booking.createdAt,
     updatedAt: booking.updatedAt,
@@ -47,7 +64,7 @@ const createClientBooking = asyncHandler(async (req, res) => {
       type: 'Custom',
       customDescription: 'To be assigned by the studio after approval',
     },
-    payment: { totalAmount: 0, advancePayment: 0 },
+    payment: { totalAmount: 0, paymentEntries: [] },
   });
 
   return sendSuccess(res, {

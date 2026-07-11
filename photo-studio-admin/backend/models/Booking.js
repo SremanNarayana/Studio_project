@@ -39,6 +39,26 @@ const projectStageSchema = new mongoose.Schema(
   { _id: false }
 );
 
+const paymentEntrySchema = new mongoose.Schema(
+  {
+    amount: {
+      type: Number,
+      required: true,
+      min: 0,
+    },
+    description: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    receivedOn: {
+      type: Date,
+      default: Date.now,
+    },
+  },
+  { _id: false }
+);
+
 const bookingSchema = new mongoose.Schema(
   {
     trackingNumber: {
@@ -88,9 +108,11 @@ const bookingSchema = new mongoose.Schema(
     // ---------- Payments ----------
     payment: {
       totalAmount: { type: Number, required: true, min: 0, default: 0 },
+      paidAmount: { type: Number, min: 0, default: 0 },
       advancePayment: { type: Number, min: 0, default: 0 },
       balancePayment: { type: Number, min: 0, default: 0 },
       paymentStatus: { type: String, enum: PAYMENT_STATUS, default: 'Pending' },
+      paymentEntries: { type: [paymentEntrySchema], default: [] },
     },
 
     // ---------- Project Timeline ----------
@@ -109,15 +131,37 @@ const bookingSchema = new mongoose.Schema(
 
 // ---------- Hooks ----------
 
-// Keep balancePayment in sync with total - advance whenever either changes.
+// Keep payment summary fields in sync with the list of payment entries.
 bookingSchema.pre('save', function keepBalanceInSync(next) {
   const total = this.payment?.totalAmount || 0;
-  const advance = this.payment?.advancePayment || 0;
-  this.payment.balancePayment = Math.max(total - advance, 0);
+  const entries = Array.isArray(this.payment?.paymentEntries) ? this.payment.paymentEntries : [];
+
+  if (entries.length === 0 && (this.payment?.advancePayment || 0) > 0) {
+    this.payment.paymentEntries = [
+      {
+        amount: this.payment.advancePayment,
+        description: 'Legacy payment entry',
+        receivedOn: this.createdAt || new Date(),
+      },
+    ];
+  } else {
+    this.payment.paymentEntries = entries
+      .filter((entry) => Number(entry?.amount) > 0)
+      .map((entry) => ({
+        amount: Number(entry.amount),
+        description: String(entry.description || '').trim(),
+        receivedOn: entry.receivedOn || new Date(),
+      }));
+  }
+
+  const paid = this.payment.paymentEntries.reduce((sum, entry) => sum + (Number(entry.amount) || 0), 0);
+  this.payment.paidAmount = paid;
+  this.payment.advancePayment = paid; // Legacy aggregate kept for compatibility with older data paths.
+  this.payment.balancePayment = Math.max(total - paid, 0);
 
   if (this.payment.balancePayment === 0 && total > 0) {
     this.payment.paymentStatus = 'Completed';
-  } else if (advance > 0) {
+  } else if (paid > 0) {
     this.payment.paymentStatus = 'Partial';
   } else {
     this.payment.paymentStatus = 'Pending';

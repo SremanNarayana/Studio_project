@@ -6,6 +6,16 @@ const { sendSuccess } = require('../utils/apiResponse');
 const { PROJECT_STAGES, STAGE_STATUS, APPROVAL_STATUS } = require('../config/constants');
 const { sendStageUpdateSms, sendBookingCreatedSms } = require('../services/smsService');
 
+function buildPaymentRemark(entry) {
+  const amount = new Intl.NumberFormat('en-IN', {
+    style: 'currency',
+    currency: 'INR',
+    maximumFractionDigits: 0,
+  }).format(entry.amount || 0);
+  const date = entry.receivedOn ? new Date(entry.receivedOn).toLocaleDateString('en-IN') : 'today';
+  return `Payment noted: ${amount} - ${entry.description} (${date})`;
+}
+
 // @desc    Create a new booking (tracking number auto-generated)
 // @route   POST /api/bookings
 const createBooking = asyncHandler(async (req, res) => {
@@ -128,13 +138,24 @@ const deleteBooking = asyncHandler(async (req, res) => {
 // @route   PATCH /api/bookings/:id/stage
 // @body    { stageName, status, completedDate?, remarks? }
 const updateStage = asyncHandler(async (req, res) => {
-  const { stageName, status, completedDate, remarks } = req.body;
+  const { stageName, status, completedDate, remarks, paymentEntry } = req.body;
 
   if (!PROJECT_STAGES.includes(stageName)) {
     throw new ApiError(400, `Invalid stageName. Must be one of: ${PROJECT_STAGES.join(', ')}`);
   }
   if (status && !STAGE_STATUS.includes(status)) {
     throw new ApiError(400, `Invalid status. Must be one of: ${STAGE_STATUS.join(', ')}`);
+  }
+  if (paymentEntry) {
+    if (!Number.isFinite(Number(paymentEntry.amount)) || Number(paymentEntry.amount) <= 0) {
+      throw new ApiError(400, 'Payment amount must be greater than 0');
+    }
+    if (!String(paymentEntry.description || '').trim()) {
+      throw new ApiError(400, 'Payment description is required when recording a payment');
+    }
+    if (paymentEntry.receivedOn && Number.isNaN(new Date(paymentEntry.receivedOn).getTime())) {
+      throw new ApiError(400, 'Payment date is invalid');
+    }
   }
 
   const booking = await Booking.findById(req.params.id);
@@ -147,6 +168,17 @@ const updateStage = asyncHandler(async (req, res) => {
   if (completedDate !== undefined) stage.completedDate = completedDate;
   if (status === 'Completed' && !stage.completedDate) stage.completedDate = new Date();
   if (remarks !== undefined) stage.remarks = remarks;
+  let normalizedPaymentEntry = null;
+  if (paymentEntry) {
+    normalizedPaymentEntry = {
+      amount: Number(paymentEntry.amount),
+      description: String(paymentEntry.description).trim(),
+      receivedOn: paymentEntry.receivedOn ? new Date(paymentEntry.receivedOn) : new Date(),
+    };
+    booking.payment.paymentEntries.push(normalizedPaymentEntry);
+    const paymentRemark = buildPaymentRemark(normalizedPaymentEntry);
+    stage.remarks = stage.remarks ? `${stage.remarks}\n${paymentRemark}` : paymentRemark;
+  }
 
   // Advance currentStage to the first non-completed stage, in defined order.
   const nextPending = PROJECT_STAGES.find((name) => {
@@ -159,7 +191,7 @@ const updateStage = asyncHandler(async (req, res) => {
 
   let sms;
   try {
-    sms = await sendStageUpdateSms(booking, stageName);
+    sms = await sendStageUpdateSms(booking, stageName, normalizedPaymentEntry);
   } catch (error) {
     console.error(`Stage saved but SMS failed for ${booking.trackingNumber}:`, error.message);
     sms = { sent: false, mode: 'error', error: error.message };

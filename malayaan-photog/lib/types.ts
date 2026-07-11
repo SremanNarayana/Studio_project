@@ -83,6 +83,17 @@ export type PublicBooking = {
     venueName?: string;
     venueAddress?: string;
   };
+  payment?: {
+    totalAmount: number;
+    paidAmount: number;
+    balancePayment: number;
+    paymentStatus: string;
+    paymentEntries?: {
+      amount: number;
+      description: string;
+      receivedOn?: string | null;
+    }[];
+  };
   currentStage?: string;
   estimatedDeliveryDate?: string | null;
   projectTimeline?: PublicProjectStage[];
