@@ -97,6 +97,11 @@ export type PublicBooking = {
   currentStage?: string;
   estimatedDeliveryDate?: string | null;
   projectTimeline?: PublicProjectStage[];
+  referral?: {
+    referralCode: string;
+    points: number;
+    rupeeValue: number;
+  } | null;
   createdAt?: string;
 };
 

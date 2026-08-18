@@ -125,6 +125,9 @@ const bookingSchema = new mongoose.Schema(
     },
     estimatedDeliveryDate: { type: Date, default: null },
     adminNotes: { type: String, trim: true, default: '' },
+
+    // Set when this booking was created using an eligible customer's code.
+    referralCodeUsed: { type: String, trim: true, uppercase: true, default: '' },
   },
   { timestamps: true } // createdAt / updatedAt
 );
@@ -187,5 +190,6 @@ bookingSchema.index({ 'personalDetails.fullName': 'text', trackingNumber: 'text'
 bookingSchema.index({ 'eventDetails.eventDate': 1 });
 bookingSchema.index({ currentStage: 1 });
 bookingSchema.index({ 'payment.paymentStatus': 1 });
+bookingSchema.index({ referralCodeUsed: 1 });
 
 module.exports = mongoose.model('Booking', bookingSchema);

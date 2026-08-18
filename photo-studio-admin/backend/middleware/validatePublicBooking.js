@@ -1,5 +1,5 @@
 const { body, validationResult } = require('express-validator');
-const { SHOOT_TYPES } = require('../config/constants');
+const { SHOOT_TYPES, REQUIREMENTS } = require('../config/constants');
 const { sendError } = require('../utils/apiResponse');
 
 function handleValidation(req, res, next) {
@@ -37,6 +37,10 @@ const validatePublicBooking = [
   body('eventTime').optional({ checkFalsy: true }).matches(/^([01]\d|2[0-3]):[0-5]\d$/).withMessage('Event time must use HH:mm format'),
   body('venueName').optional({ checkFalsy: true }).isString().trim().isLength({ max: 150 }).withMessage('Venue name must be at most 150 characters'),
   body('venueAddress').optional({ checkFalsy: true }).isString().trim().isLength({ max: 500 }).withMessage('Venue address must be at most 500 characters'),
+  body('requirements').optional().isArray({ max: 7 }).withMessage('Requirements must be a list'),
+  body('requirements.*').optional().isIn(REQUIREMENTS).withMessage('Invalid requirement'),
+  body('enquiryNotes').optional({ checkFalsy: true }).isString().trim().isLength({ max: 2000 }).withMessage('Enquiry notes must be at most 2000 characters'),
+  body('referralCode').optional({ checkFalsy: true }).isString().trim().isLength({ min: 5, max: 30 }).withMessage('Referral code is invalid'),
   handleValidation,
 ];
 

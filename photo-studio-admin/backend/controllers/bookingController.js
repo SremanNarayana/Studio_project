@@ -4,7 +4,20 @@ const asyncHandler = require('../utils/asyncHandler');
 const ApiError = require('../utils/ApiError');
 const { sendSuccess } = require('../utils/apiResponse');
 const { PROJECT_STAGES, STAGE_STATUS, APPROVAL_STATUS } = require('../config/constants');
-const { sendStageUpdateSms, sendBookingCreatedSms } = require('../services/smsService');
+const { sendStageUpdateWhatsApp, sendBookingCreatedWhatsApp } = require('../services/whatsappService');
+const {
+  createReferralAccount,
+  validateReferral,
+  grantReferralReward,
+  accountSummary,
+  normalizePhone,
+} = require('../services/referralService');
+
+async function withReferralSummary(booking) {
+  const ReferralAccount = require('../models/ReferralAccount');
+  const referral = await ReferralAccount.findOne({ phoneNumber: normalizePhone(booking.personalDetails.phoneNumber) });
+  return { ...booking.toObject(), referral: accountSummary(referral) };
+}
 
 function buildPaymentRemark(entry) {
   const amount = new Intl.NumberFormat('en-IN', {
@@ -20,26 +33,31 @@ function buildPaymentRemark(entry) {
 // @route   POST /api/bookings
 const createBooking = asyncHandler(async (req, res) => {
   const trackingNumber = await generateTrackingNumber();
+  const eligibleAccount = await validateReferral({
+    referralCode: req.body.referralCodeUsed,
+    phoneNumber: req.body.personalDetails.phoneNumber,
+  });
 
   const booking = await Booking.create({
     ...req.body,
     trackingNumber,
     approvalStatus: 'Approved',
   });
+  await grantReferralReward({ booking, referralCode: req.body.referralCodeUsed, account: eligibleAccount });
 
-  let sms;
+  let whatsapp;
   try {
-    sms = await sendBookingCreatedSms(booking);
+    whatsapp = await sendBookingCreatedWhatsApp(booking);
   } catch (error) {
-    console.error(`Booking created but SMS failed for ${booking.trackingNumber}:`, error.message);
-    sms = { sent: false, mode: 'error', error: error.message };
+    console.error(`Booking created but WhatsApp failed for ${booking.trackingNumber}:`, error.message);
+    whatsapp = { sent: false, mode: 'error', error: error.message };
   }
 
   return sendSuccess(res, {
     statusCode: 201,
     message: 'Booking created successfully',
-    data: booking,
-    meta: { sms },
+    data: await withReferralSummary(booking),
+    meta: { whatsapp },
   });
 });
 
@@ -108,7 +126,7 @@ const searchBookings = asyncHandler(async (req, res) => {
 const getBookingById = asyncHandler(async (req, res) => {
   const booking = await Booking.findById(req.params.id);
   if (!booking) throw new ApiError(404, 'Booking not found');
-  return sendSuccess(res, { message: 'Booking fetched successfully', data: booking });
+  return sendSuccess(res, { message: 'Booking fetched successfully', data: await withReferralSummary(booking) });
 });
 
 // @desc    Update a booking's details
@@ -118,12 +136,12 @@ const updateBooking = asyncHandler(async (req, res) => {
   if (!booking) throw new ApiError(404, 'Booking not found');
 
   // trackingNumber must never be overwritten by the client
-  const { trackingNumber, projectTimeline, ...updatable } = req.body;
+  const { trackingNumber, projectTimeline, referralCodeUsed, ...updatable } = req.body;
 
   Object.assign(booking, updatable);
   await booking.save();
 
-  return sendSuccess(res, { message: 'Booking updated successfully', data: booking });
+  return sendSuccess(res, { message: 'Booking updated successfully', data: await withReferralSummary(booking) });
 });
 
 // @desc    Delete a booking
@@ -189,15 +207,23 @@ const updateStage = asyncHandler(async (req, res) => {
 
   await booking.save();
 
-  let sms;
+  const isDeliveryCompleted = stageName === 'Delivery' && stage.status === 'Completed';
+  const referralAccount = isDeliveryCompleted ? await createReferralAccount(booking) : null;
+  const bookingWithReferral = await withReferralSummary(booking);
+
+  let whatsapp;
   try {
-    sms = await sendStageUpdateSms(booking, stageName, normalizedPaymentEntry);
+    whatsapp = await sendStageUpdateWhatsApp(booking, stageName, normalizedPaymentEntry);
   } catch (error) {
-    console.error(`Stage saved but SMS failed for ${booking.trackingNumber}:`, error.message);
-    sms = { sent: false, mode: 'error', error: error.message };
+    console.error(`Stage saved but WhatsApp failed for ${booking.trackingNumber}:`, error.message);
+    whatsapp = { sent: false, mode: 'error', error: error.message };
   }
 
-  return sendSuccess(res, { message: 'Stage updated successfully', data: booking, meta: { sms } });
+  return sendSuccess(res, {
+    message: isDeliveryCompleted ? 'Stage updated and referral code issued successfully' : 'Stage updated successfully',
+    data: { ...bookingWithReferral, referral: accountSummary(referralAccount) || bookingWithReferral.referral },
+    meta: { whatsapp },
+  });
 });
 
 // @desc    Approve or reject a client booking request

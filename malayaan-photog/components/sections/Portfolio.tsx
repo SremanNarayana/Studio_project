@@ -2,23 +2,21 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
-import { X, ChevronLeft, ChevronRight } from "lucide-react";
+import { X, ChevronLeft, ChevronRight, ArrowUpRight } from "lucide-react";
+import Image from "next/image";
 
-type Item = { src: string; category: string; title: string; span?: string };
+type Item = { src: string; category: string; title: string; span?: string; pos?: string };
 
 const items: Item[] = [
-  { src: "/portfolio-01.jpg", category: "Weddings", title: "Sacred Beginnings", span: "row-span-2" },
-  { src: "/portfolio-02.jpg", category: "Couples", title: "Golden Hour" },
-  { src: "/portfolio-03.jpg", category: "Traditional", title: "Timeless Grace" },
-  { src: "/portfolio-04.jpg", category: "Weddings", title: "Temple Vows", span: "col-span-2" },
-  { src: "/portfolio-05.jpg", category: "Couples", title: "Twilight Embrace" },
-  { src: "/portfolio-06.jpg", category: "Weddings", title: "Together Forever" },
-  { src: "/portfolio-07.jpg", category: "Engagements", title: "She Said Yes", span: "row-span-2" },
-  { src: "/portfolio-09.jpg", category: "Traditional", title: "Heritage & Joy" },
-  { src: "/portfolio-10.jpg", category: "Weddings", title: "Bride Sneha" },
-  { src: "/portfolio-11.jpg", category: "Couples", title: "Sunset Romance" },
-  { src: "/portfolio-12.jpg", category: "Family", title: "Eternal Bond" },
-  { src: "/portfolio-13.jpg", category: "Weddings", title: "The First Kiss" },
+  { src: "/portfolio-new-1.jpg", category: "Weddings", title: "Sacred Beginnings", span: "row-span-2" },
+  { src: "/portfolio-new-2.jpg", category: "Couples", title: "Golden Hour" },
+  { src: "/portfolio-new-3.jpg", category: "Traditional", title: "Timeless Grace" },
+  { src: "/portfolio-new-7.jpg", category: "Engagements", title: "She Said Yes", span: "row-span-2" },
+  { src: "/portfolio-new-5.jpg", category: "Couples", title: "Twilight Embrace" },
+  { src: "/portfolio-new-6.jpg", category: "Weddings", title: "Together Forever" },
+  { src: "/portfolio-new-4.jpg", category: "Weddings", title: "Temple Vows", span: "col-span-2", pos: "object-[center_8%]" },
+  { src: "/portfolio-new-8.jpg", category: "Traditional", title: "Heritage & Joy" },
+  { src: "/portfolio-new-9.jpg", category: "Family", title: "Eternal Bond" },
 ];
 
 const categories = ["All", "Weddings", "Couples", "Engagements", "Family", "Traditional"];
@@ -46,46 +44,55 @@ export function Portfolio() {
           </div>
           <div className="flex flex-wrap gap-2">
             {categories.map((c) => (
-              <button
+              <PortfolioPill
                 key={c}
+                label={c}
+                active={filter === c}
                 onClick={() => setFilter(c)}
-                className={`px-4 py-2 rounded-full text-xs uppercase tracking-[0.18em] border transition-all ${
-                  filter === c
-                    ? "bg-gold-400 border-gold-400 text-ink-950"
-                    : "border-black/10 text-ivory-100/70 hover:border-gold-400/60"
-                }`}
-              >
-                {c}
-              </button>
+              />
             ))}
           </div>
         </motion.div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 auto-rows-[240px] gap-3">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 auto-rows-[240px] gap-4 grid-flow-row-dense">
           <AnimatePresence mode="popLayout">
             {filtered.map((item, i) => (
               <motion.button
                 layout
                 key={item.src + item.title}
-                initial={{ opacity: 0, scale: 0.95 }}
+                initial={{ opacity: 0, scale: 0.96 }}
                 animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                transition={{ duration: 0.4, delay: i * 0.03 }}
+                exit={{ opacity: 0, scale: 0.96 }}
+                transition={{ duration: 0.5, delay: i * 0.03, ease: [0.22, 1, 0.36, 1] }}
                 onClick={() => setLightbox(i)}
-                className={`relative overflow-hidden group rounded-sm ${item.span ?? ""}`}
+                className={`group relative overflow-hidden rounded-2xl bg-ink-850 shadow-[0_14px_34px_-20px_rgba(0,0,0,0.4)] ring-1 ring-transparent transition-[box-shadow] duration-300 hover:shadow-[0_32px_60px_-26px_rgba(0,0,0,0.55)] hover:ring-gold-400/40 ${item.span ?? ""}`}
               >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
+                <Image
                   src={item.src}
                   alt={item.title}
-                  className="h-full w-full object-cover transition-transform duration-1000 group-hover:scale-110"
+                  fill
+                  sizes="(min-width: 1024px) 25vw, (min-width: 768px) 33vw, 50vw"
+                  className={`object-cover transition-transform duration-700 ease-out group-hover:scale-[1.08] ${item.pos ?? ""}`}
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-ink-950 via-ink-950/20 to-transparent opacity-50 group-hover:opacity-90 transition-opacity duration-500" />
-                <div className="absolute inset-x-0 bottom-0 p-5 translate-y-2 group-hover:translate-y-0 transition-transform duration-500">
-                  <div className="text-[10px] uppercase tracking-[0.25em] text-gold-600 mb-1">
+                {/* Warm cinematic gradient — subtle at rest, richer on hover */}
+                <div className="absolute inset-0 bg-gradient-to-t from-[#14100e]/85 via-[#14100e]/10 to-transparent opacity-70 transition-opacity duration-500 group-hover:opacity-100" />
+
+                {/* View indicator — reveals on hover */}
+                <div className="absolute right-3 top-3 flex h-9 w-9 translate-y-1 items-center justify-center rounded-full border border-white/25 bg-white/15 text-white opacity-0 backdrop-blur-md transition-all duration-500 group-hover:translate-y-0 group-hover:opacity-100">
+                  <ArrowUpRight className="h-4 w-4" />
+                </div>
+
+                {/* Caption */}
+                <div className="absolute inset-x-0 bottom-0 p-5 text-left">
+                  <div className="mb-1.5 translate-y-1 text-[10px] uppercase tracking-[0.28em] text-gold-300 opacity-0 transition-all duration-500 group-hover:translate-y-0 group-hover:opacity-100">
                     {item.category}
                   </div>
-                  <div className="font-display text-xl text-ivory-100">{item.title}</div>
+                  <div className="font-display text-xl leading-tight text-white sm:text-2xl">
+                    {item.title}
+                  </div>
+                  <div className="mt-2 inline-flex items-center gap-1.5 text-[9px] uppercase tracking-[0.22em] text-white/70 opacity-0 transition-opacity delay-75 duration-500 group-hover:opacity-100">
+                    View Story <ArrowUpRight className="h-3 w-3" />
+                  </div>
                 </div>
               </motion.button>
             ))}
@@ -153,5 +160,36 @@ export function Portfolio() {
         )}
       </AnimatePresence>
     </section>
+  );
+}
+
+function PortfolioPill({
+  label,
+  active,
+  onClick,
+}: {
+  label: string;
+  active: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className={`relative shrink-0 rounded-full border px-5 py-2 text-xs uppercase tracking-[0.18em] transition-all duration-300 hover:scale-105 ${
+        active
+          ? "border-transparent text-ink-950"
+          : "border-black/10 text-ivory-100/70 hover:border-gold-400/60 hover:text-ivory-50"
+      }`}
+    >
+      {/* Sliding active indicator — glides between pills on filter change */}
+      {active && (
+        <motion.span
+          layoutId="portfolioActivePill"
+          transition={{ type: "spring", stiffness: 400, damping: 32 }}
+          className="absolute inset-0 rounded-full bg-gradient-to-r from-gold-500 to-gold-400 shadow-[0_8px_20px_-8px_rgba(194,161,75,0.6)]"
+        />
+      )}
+      <span className="relative z-10">{label}</span>
+    </button>
   );
 }

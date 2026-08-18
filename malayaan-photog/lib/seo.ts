@@ -9,7 +9,7 @@ export const BUSINESS = {
   tagline: "Capturing Emotions. Creating Timeless Memories.",
   phone: "+91 77081 13657",
   phoneRaw: "+917708113657",
-  email: "hello@malayaanphotography.com",
+  email: "malayanphotography07@gmail.com",
   street: "Therkkupatty, Surakkundu",
   city: "Melur",
   region: "Tamil Nadu",

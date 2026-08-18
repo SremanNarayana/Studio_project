@@ -3,18 +3,29 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown } from "lucide-react";
 import { useEffect, useState } from "react";
+import Image from "next/image";
 
 const slides = [
-  "https://images.unsplash.com/photo-1519741497674-611481863552?w=2400&q=85",
-  "https://images.unsplash.com/photo-1591604466107-ec97de577aff?w=2400&q=85",
-  "https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=2400&q=85",
-  "https://images.unsplash.com/photo-1606216794074-735e91aa2c92?w=2400&q=85",
+  "/hero-4.jpg",
+  "/hero-2.jpg",
+  "/hero-3.jpg",
+  "/hero-1.jpg",
+];
+
+// Focal point per slide so the couple's faces sit correctly within the crop on
+// both desktop (crops top/bottom) and mobile (crops the sides).
+const slidePos = [
+  "object-[center_35%]", // hero-4 (now first) — landscape, faces upper-centre
+  "object-[center_32%]", // hero-2 — landscape, couple embraced (centred via ken-burns pan)
+  "object-[center_33%]", // hero-3 — tall portrait, faces about a third down
+  "object-[center_40%]", // hero-1 (now last) — full-body street portrait, faces ~40% down
 ];
 
 // Alternating Ken Burns moves — each slide zooms + drifts in a unique direction.
 const kenBurns = [
   { scale: [1.12, 1.0], x: ["-2%", "1%"], y: ["1%", "-2%"] },
-  { scale: [1.0, 1.14], x: ["2%", "-1%"], y: ["-1%", "2%"] },
+  // Slide 2: couple is composed to the left — zoom in + pan right to centre them.
+  { scale: [1.26, 1.34], x: ["12%", "10%"], y: ["-2%", "0%"] },
   { scale: [1.1, 1.0], x: ["1%", "-2%"], y: ["-2%", "1%"] },
   { scale: [1.0, 1.12], x: ["-1%", "2%"], y: ["2%", "-1%"] },
 ];
@@ -63,11 +74,13 @@ export function Hero() {
                 }}
                 transition={{ duration: SLIDE_MS / 1000 + 2, ease: "linear" }}
               >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
+                <Image
                   src={slides[idx]}
                   alt=""
-                  className="h-full w-full object-cover"
+                  fill
+                  priority={idx === 0}
+                  sizes="100vw"
+                  className={`object-cover ${slidePos[idx]}`}
                   draggable={false}
                 />
               </motion.div>

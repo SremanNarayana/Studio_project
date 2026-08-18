@@ -36,6 +36,7 @@ const bookingRules = (isUpdate = false) => {
     body('payment.paymentEntries.*.amount').optional().isFloat({ min: 0 }).withMessage('Payment amount must be a positive number'),
     body('payment.paymentEntries.*.description').optional().trim().notEmpty().withMessage('Payment description is required'),
     body('payment.paymentEntries.*.receivedOn').optional({ checkFalsy: true }).isISO8601().withMessage('Payment date must be valid'),
+    body('referralCodeUsed').optional({ checkFalsy: true }).isString().trim().isLength({ min: 5, max: 30 }).withMessage('Referral code is invalid'),
   ];
 };
 

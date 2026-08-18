@@ -56,9 +56,9 @@ export default function BookingDetails() {
       });
       setBooking(res.data);
       const paymentText = draft.paymentEntry ? ' · payment recorded' : '';
-      if (res.meta?.sms?.sent) showToast(`"${stageName}" updated${paymentText} · SMS sent`, 'success');
-      else if (res.meta?.sms?.mode === 'log-only') showToast(`"${stageName}" updated · SMS preview logged`, 'success');
-      else showToast(`"${stageName}" updated · SMS could not be sent`, 'error');
+      if (res.meta?.whatsapp?.sent) showToast(`"${stageName}" updated${paymentText} · WhatsApp sent`, 'success');
+      else if (res.meta?.whatsapp?.mode === 'log-only') showToast(`"${stageName}" updated · WhatsApp preview logged`, 'success');
+      else showToast(`"${stageName}" updated · WhatsApp could not be sent`, 'error');
     } catch (err) {
       showToast(err.message, 'error');
     } finally {
@@ -217,6 +217,24 @@ export default function BookingDetails() {
               ]}
             />
           </div>
+
+          {(booking.referral || booking.referralCodeUsed) && (
+            <div className="card" style={{ padding: 24 }}>
+              <SectionTitle icon="🎁" title="Referral Rewards" />
+              {booking.referral ? (
+                <InfoGrid
+                  items={[
+                    ['Your Referral Code', <span className="tracking-no">{booking.referral.referralCode}</span>],
+                    ['Points Balance', `${booking.referral.points} points`],
+                    ['Reward Value', currency(booking.referral.rupeeValue)],
+                    ['Code Used on This Booking', booking.referralCodeUsed || '—'],
+                  ]}
+                />
+              ) : (
+                <p style={{ fontSize: 13, color: 'var(--ink-400)', margin: 0 }}>Referral code used: <span className="tracking-no">{booking.referralCodeUsed}</span></p>
+              )}
+            </div>
+          )}
 
           {booking.adminNotes && (
             <div className="card" style={{ padding: 24 }}>

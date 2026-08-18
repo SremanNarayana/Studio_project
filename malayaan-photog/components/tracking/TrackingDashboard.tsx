@@ -1,18 +1,27 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ArrowLeft, Calendar, Check, Clock3, MapPin, MessageCircle } from "lucide-react";
+import { useState } from "react";
+import { ArrowLeft, Calendar, Check, Clock3, Copy, Gift, MapPin, MessageCircle } from "lucide-react";
 import type { PublicBooking } from "@/lib/types";
 
 const currency = (n: number) =>
   new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 }).format(n || 0);
 
 export function TrackingDashboard({ booking, onBack }: { booking: PublicBooking; onBack: () => void }) {
+  const [copied, setCopied] = useState(false);
   const pending = booking.approvalStatus === "Pending";
   const approved = booking.approvalStatus === "Approved";
   const stages = booking.projectTimeline ?? [];
   const completed = stages.filter((stage) => stage.status === "Completed").length;
   const progress = stages.length ? Math.round((completed / stages.length) * 100) : 0;
+  const deliveryCompleted = stages.some((stage) => stage.stageName === "Delivery" && stage.status === "Completed");
+  async function copyReferralCode() {
+    if (!booking.referral?.referralCode) return;
+    await navigator.clipboard?.writeText(booking.referral.referralCode);
+    setCopied(true);
+    window.setTimeout(() => setCopied(false), 1800);
+  }
 
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="max-w-4xl mx-auto">
@@ -65,6 +74,23 @@ export function TrackingDashboard({ booking, onBack }: { booking: PublicBooking;
                   </div>
                 </div>
               ))}
+            </div>
+          </section>
+        )}
+
+        {deliveryCompleted && booking.referral?.referralCode && (
+          <section className="mt-10 rounded-sm border border-gold-500/30 bg-gold-400/[0.08] p-6 sm:p-7">
+            <div className="flex items-start gap-4">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gold-500 text-white"><Gift className="h-5 w-5" /></span>
+              <div className="min-w-0 flex-1">
+                <p className="text-[10px] uppercase tracking-[0.28em] text-gold-700">Your referral reward</p>
+                <h2 className="mt-1 font-display text-2xl text-ivory-50">Share your code, earn rewards</h2>
+                <p className="mt-2 text-sm text-ivory-100/65">Share this code with a new customer. You earn points when they book with Malayaan Photography.</p>
+                <div className="mt-5 flex flex-wrap items-center gap-3">
+                  <code className="rounded-sm border border-gold-500/30 bg-white px-4 py-2.5 text-base font-semibold tracking-[0.12em] text-ivory-50">{booking.referral.referralCode}</code>
+                  <button type="button" onClick={copyReferralCode} className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.16em] text-gold-700 hover:text-gold-600">{copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}{copied ? "Copied" : "Copy code"}</button>
+                </div>
+              </div>
             </div>
           </section>
         )}

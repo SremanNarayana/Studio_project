@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 
 const stats = [
   { value: 38, suffix: "+", label: "Five-Star Reviews" },
@@ -57,11 +58,12 @@ export function About() {
           className="lg:col-span-5 relative"
         >
           <div className="relative aspect-[4/5] overflow-hidden rounded-sm gold-border">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
+            <Image
               src="/about-photo.jpg"
               alt="Wedding couple holding hands with garlands"
-              className="h-full w-full object-cover"
+              fill
+              sizes="(min-width: 1024px) 40vw, 100vw"
+              className="object-cover"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-ink-950/60 to-transparent" />
           </div>

@@ -7,6 +7,7 @@ const dashboardRoutes = require('./routes/dashboardRoutes');
 const clientBookingRoutes = require('./routes/clientBookingRoutes');
 const settingsRoutes = require('./routes/settingsRoutes');
 const analyticsRoutes = require('./routes/analyticsRoutes');
+const galleryRoutes = require('./routes/galleryRoutes');
 const { errorHandler, notFound } = require('./middleware/errorHandler');
 
 const app = express();
@@ -24,7 +25,9 @@ app.use(cors({
     return callback(new Error('Origin not allowed by CORS'));
   },
 }));
-app.use(express.json({ limit: '32kb' }));
+// Gallery albums can contain several compressed images. Keep this below
+// MongoDB's 16 MB document limit after base64 encoding.
+app.use(express.json({ limit: '16mb' }));
 app.use(express.urlencoded({ extended: true, limit: '32kb' }));
 if (process.env.NODE_ENV !== 'test') {
   app.use(morgan('dev'));
@@ -43,6 +46,7 @@ app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/client/bookings', clientBookingRoutes);
 app.use('/api/settings', settingsRoutes);
 app.use('/api/analytics', analyticsRoutes);
+app.use('/api/gallery', galleryRoutes);
 
 // ---------- 404 + error handling (must be last) ----------
 app.use(notFound);

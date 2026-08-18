@@ -53,6 +53,7 @@ export default function BookingForm() {
           albumRequired: b.albumRequired,
           package: b.package,
           payment: { totalAmount: b.payment.totalAmount, paymentEntries: normalizePaymentEntries(b.payment) },
+          referralCodeUsed: b.referralCodeUsed || '',
           estimatedDeliveryDate: b.estimatedDeliveryDate?.slice(0, 10) || '',
           adminNotes: b.adminNotes || '',
         });
@@ -125,8 +126,16 @@ export default function BookingForm() {
         showToast('Booking updated successfully', 'success');
       } else {
         const res = await bookingService.create(form);
-        const smsText = res.meta?.sms?.sent ? ' · Booking ID sent by SMS' : ' · SMS not sent';
-        showToast(`Booking ${res.data.trackingNumber} created successfully${smsText}`, res.meta?.sms?.sent ? 'success' : 'error');
+        const whatsapp = res.meta?.whatsapp;
+        const whatsappText = whatsapp?.sent
+          ? ' · Booking ID sent by WhatsApp'
+          : whatsapp?.mode === 'log-only'
+            ? ' · WhatsApp preview logged'
+            : ' · WhatsApp could not be sent';
+        showToast(
+          `Booking ${res.data.trackingNumber} created successfully${whatsappText}`,
+          whatsapp?.mode === 'error' ? 'error' : 'success'
+        );
       }
       navigate('/bookings');
     } catch (err) {
@@ -181,6 +190,19 @@ export default function BookingForm() {
             </Field>
           </div>
         </section>
+
+        {!isEdit && (
+          <section className="card" style={{ padding: 24 }}>
+            <span className="eyebrow" style={{ marginBottom: 12, display: 'inline-flex' }}>🎁 Referral</span>
+            <p style={{ color: 'var(--ink-400)', fontSize: 13, margin: '0 0 14px' }}>
+              Enter a completed customer's referral code. The referrer earns 25 points (₹5); 50 points equal ₹10.
+            </p>
+            <Field label="Referral Code (optional)">
+              <input className="field-input" value={form.referralCodeUsed}
+                onChange={(e) => setPath('referralCodeUsed', e.target.value.toUpperCase())} placeholder="e.g., MAL-AB12CD34" />
+            </Field>
+          </section>
+        )}
 
         {/* Event Details */}
         <section className="card" style={{ padding: 24 }}>

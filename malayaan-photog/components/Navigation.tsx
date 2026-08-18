@@ -7,11 +7,12 @@ import { AnimatePresence, motion } from "framer-motion";
 
 const links = [
   { href: "/#portfolio", label: "Portfolio" },
+  { href: "/gallery", label: "Gallery" },
   { href: "/#services", label: "Services" },
   { href: "/#process", label: "Process" },
   { href: "/packages", label: "Packages" },
   { href: "/#about", label: "About" },
-  { href: "/track", label: "Track My Project" },
+  { href: "/book-now", label: "Book Now" },
 ];
 
 export function Navigation() {
@@ -29,10 +30,10 @@ export function Navigation() {
     <>
       <header className="fixed inset-x-0 top-3 sm:top-4 lg:top-5 z-50 flex justify-center px-3 sm:px-4 lg:px-6">
         <div
-          className={`w-full max-w-7xl rounded-full border border-white/10 shadow-[0_8px_20px_-12px_rgba(0,0,0,0.35)] transition-all duration-500 ${
+          className={`w-full max-w-7xl rounded-full border shadow-[0_12px_40px_-14px_rgba(0,0,0,0.5)] transition-all duration-500 ${
             scrolled
-              ? "py-1.5 backdrop-blur-2xl bg-[#0e0d12]/90 border-gold-400/20"
-              : "py-2 bg-[#0e0d12]/60 backdrop-blur-sm"
+              ? "py-1.5 backdrop-blur-2xl bg-[#14100e]/90 border-[#c8a96a]/25"
+              : "py-2 bg-[#14100e]/55 backdrop-blur-md border-[#c8a96a]/10"
           }`}
         >
           <div className="w-full px-2.5 sm:px-3 lg:px-4 flex items-center justify-between">
@@ -52,7 +53,7 @@ export function Navigation() {
                 <Link
                   key={l.href}
                   href={l.href}
-                  className="text-[9px] sm:text-[10px] tracking-[0.2em] uppercase text-white/75 hover:text-gold-300 transition-colors"
+                  className="relative text-[9px] sm:text-[10px] tracking-[0.22em] uppercase text-white/75 transition-all duration-300 hover:text-[#c8a96a] hover:[text-shadow:0_0_12px_rgba(200,169,106,0.55)] after:absolute after:-bottom-1.5 after:left-0 after:h-px after:w-0 after:bg-[#c8a96a] after:transition-all after:duration-300 hover:after:w-full"
                 >
                   {l.label}
                 </Link>
@@ -109,6 +110,20 @@ export function Navigation() {
                   </Link>
                 </motion.div>
               ))}
+              {/* Track Project — the desktop pill is hidden on mobile, so surface it here */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: links.length * 0.06 }}
+              >
+                <Link
+                  href="/track"
+                  onClick={() => setOpen(false)}
+                  className="font-display text-3xl tracking-wide text-gold-600 hover:text-gold-500"
+                >
+                  Track Project
+                </Link>
+              </motion.div>
             </nav>
           </motion.div>
         )}

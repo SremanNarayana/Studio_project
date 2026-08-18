@@ -1,5 +1,5 @@
 const express = require('express');
-const { getSettings, updateSettings } = require('../controllers/smsSettingsController');
+const { getSettings, updateSettings } = require('../controllers/whatsappSettingsController');
 const router = express.Router();
-router.route('/sms').get(getSettings).put(updateSettings);
+router.route('/whatsapp').get(getSettings).put(updateSettings);
 module.exports = router;

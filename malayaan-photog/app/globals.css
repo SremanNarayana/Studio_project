@@ -26,6 +26,22 @@ html {
   scroll-behavior: smooth;
 }
 
+/* Accessibility — honor users who prefer reduced motion. Near-instant transitions,
+   no looping/scroll animations, no smooth-scroll hijack. */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 /* Logo images must respect their natural aspect ratio without parent clamping */
 img[data-logo="true"] {
   max-width: none !important;
@@ -122,6 +138,15 @@ body {
   opacity: 0.03;
   mix-blend-mode: multiply;
   background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.6'/></svg>");
+}
+
+/* Horizontal scroll containers (e.g. mobile category pills) without a visible scrollbar */
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
 }
 
 /* Marquee */

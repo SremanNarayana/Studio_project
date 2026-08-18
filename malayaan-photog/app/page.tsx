@@ -4,6 +4,7 @@ import { Services } from "@/components/sections/Services";
 import { Portfolio } from "@/components/sections/Portfolio";
 import { WhyChooseUs } from "@/components/sections/WhyChooseUs";
 import { Process } from "@/components/sections/Process";
+import { LatestVideo } from "@/components/sections/LatestVideo";
 import { FAQ } from "@/components/sections/FAQ";
 import { WhatsAppFloat } from "@/components/WhatsAppFloat";
 import { faqJsonLd } from "@/lib/seo";
@@ -27,6 +28,7 @@ export default function HomePage() {
       <Portfolio />
       <WhyChooseUs />
       <Process />
+      <LatestVideo />
       <FAQ />
       <WhatsAppFloat />
     </>

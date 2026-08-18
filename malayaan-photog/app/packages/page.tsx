@@ -16,9 +16,5 @@ export const metadata: Metadata = {
 };
 
 export default function PackagesPage() {
-  return (
-    <div className="pt-40 sm:pt-44">
-      <Packages />
-    </div>
-  );
+  return <Packages />;
 }

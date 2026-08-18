@@ -6,6 +6,7 @@ const NAV_ITEMS = [
   { to: '/bookings', label: 'Bookings', icon: '◨' },
   { to: '/bookings/new', label: 'New Booking', icon: '＋' },
   { to: '/analytics', label: 'Analytics', icon: '↗' },
+  { to: '/gallery', label: 'Gallery', icon: '▧' },
   { to: '/settings', label: 'Settings', icon: '⚙' },
 ];
 

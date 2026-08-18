@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { MapPin, Phone, Mail, Instagram, Facebook, Youtube } from "lucide-react";
 import { SERVICE_AREAS as serviceAreas } from "@/lib/seo";
 
@@ -19,12 +20,12 @@ const quick = [
 ];
 
 const insta = [
-  "https://images.unsplash.com/photo-1519741497674-611481863552?w=400&q=80",
-  "https://images.unsplash.com/photo-1606216794074-735e91aa2c92?w=400&q=80",
-  "https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=400&q=80",
-  "https://images.unsplash.com/photo-1591604466107-ec97de577aff?w=400&q=80",
-  "https://images.unsplash.com/photo-1537633552985-df8429e8048b?w=400&q=80",
-  "https://images.unsplash.com/photo-1525258946800-98cfd641d0de?w=400&q=80",
+  "/insta-1.jpg",
+  "/insta-2.jpg",
+  "/insta-3.jpg",
+  "/insta-4.jpg",
+  "/insta-5.jpg",
+  "/insta-1.jpg", // 6th slot: repeats the first (5 images provided for 6 tiles)
 ];
 
 export function Footer() {
@@ -114,10 +115,10 @@ export function Footer() {
               <li className="flex gap-3">
                 <Mail className="h-4 w-4 mt-0.5 text-gold-300 shrink-0" />
                 <a
-                  href="mailto:hello@malayaanphotography.com"
+                  href="mailto:malayanphotography07@gmail.com"
                   className="text-white/70 hover:text-gold-300"
                 >
-                  hello@malayaanphotography.com
+                  malayanphotography07@gmail.com
                 </a>
               </li>
             </ul>
@@ -155,11 +156,12 @@ export function Footer() {
                 href="#"
                 className="aspect-square overflow-hidden rounded-lg group relative border border-white/5"
               >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
+                <Image
                   src={src}
                   alt=""
-                  className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+                  fill
+                  sizes="(min-width: 640px) 16vw, 33vw"
+                  className="object-cover transition-transform duration-700 group-hover:scale-110"
                 />
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/50 flex items-center justify-center transition-all">
                   <Instagram className="h-5 w-5 opacity-0 group-hover:opacity-100 text-gold-300" />

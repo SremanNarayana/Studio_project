@@ -23,8 +23,7 @@ const sans = Inter({
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default:
-      "Malayaan Photography — Best Wedding Photographer in Madurai, Melur & Tamil Nadu",
+    default: "Malayaan Photography",
     template: "%s | Malayaan Photography",
   },
   description:

@@ -48,6 +48,7 @@ export const EMPTY_BOOKING = {
   albumRequired: false,
   package: { type: '', customDescription: '' },
   payment: { totalAmount: 0, paymentEntries: [] },
+  referralCodeUsed: '',
   estimatedDeliveryDate: '',
   adminNotes: '',
 };
