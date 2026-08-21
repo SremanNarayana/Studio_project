@@ -42,8 +42,8 @@ export default function Referrals() {
           </tr></thead>
           <tbody>{accounts.length === 0 && <tr><td colSpan="5" style={{ padding: 28, textAlign: 'center', color: 'var(--ink-400)' }}>No referral accounts yet.</td></tr>}
             {accounts.map((account) => {
-              const history = usage[id] || account.usageHistory || account.rewards || account.uses || [];
               const id = account._id || account.id || account.referralCode;
+              const history = usage[id] || account.usageHistory || account.rewards || account.uses || [];
               return <React.Fragment key={id}>
                 <tr style={{ borderTop: '1px solid var(--line)' }}>
                   <td style={{ padding: '14px 18px' }}><strong>{account.customerName || account.ownerName || '—'}</strong><div style={{ color: 'var(--ink-400)', fontSize: 12 }}>{account.phoneNumber || account.ownerPhone || '—'}</div></td>
