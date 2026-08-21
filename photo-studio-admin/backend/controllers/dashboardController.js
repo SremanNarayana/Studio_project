@@ -18,8 +18,8 @@ const getDashboardData = asyncHandler(async (req, res) => {
   ] = await Promise.all([
     Booking.countDocuments(),
     Booking.countDocuments({ 'eventDetails.eventDate': { $gte: now } }),
-    Booking.countDocuments({ currentStage: 'Delivery', 'payment.paymentStatus': 'Completed' }),
-    Booking.countDocuments({ currentStage: { $ne: 'Delivery' } }),
+    Booking.countDocuments({ projectTimeline: { $elemMatch: { stageName: 'Delivery', status: 'Completed' } } }),
+    Booking.countDocuments({ projectTimeline: { $not: { $elemMatch: { stageName: 'Delivery', status: 'Completed' } } } }),
     Booking.aggregate([{ $group: { _id: null, sum: { $sum: '$payment.advancePayment' } } }]),
     Booking.aggregate([{ $group: { _id: null, sum: { $sum: '$payment.balancePayment' } } }]),
     Booking.find()

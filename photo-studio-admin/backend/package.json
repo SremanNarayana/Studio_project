@@ -5,6 +5,7 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
+    "reset:data": "node scripts/resetPhotographyData.js",
     "dev": "nodemon server.js",
     "backfill:referrals": "node scripts/backfillReferralAccounts.js",
     "migrate:referral-indexes": "node scripts/migrateReferralIndexes.js"
