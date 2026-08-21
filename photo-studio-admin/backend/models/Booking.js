@@ -128,6 +128,9 @@ const bookingSchema = new mongoose.Schema(
 
     // Set when this booking was created using an eligible customer's code.
     referralCodeUsed: { type: String, trim: true, uppercase: true, default: '' },
+    referralPointsRedeemed: { type: Number, min: 0, default: 0 },
+    referralDiscountAmount: { type: Number, min: 0, default: 0 },
+    referralRedeemedFrom: { type: mongoose.Schema.Types.ObjectId, ref: 'ReferralAccount', default: null },
   },
   { timestamps: true } // createdAt / updatedAt
 );

@@ -4,6 +4,7 @@ import bookingService from '../services/bookingService';
 import { SHOOT_TYPES, PACKAGES, REQUIREMENTS, EMPTY_BOOKING } from '../constants';
 import Spinner from '../components/Spinner.jsx';
 import { useToast } from '../hooks/useToast.jsx';
+import referralService from '../services/referralService';
 
 const currency = (n) =>
   new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(n || 0);
@@ -36,6 +37,8 @@ export default function BookingForm() {
   const [loading, setLoading] = useState(isEdit);
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState([]);
+  const [referralAccount, setReferralAccount] = useState(null);
+  const [referralApplied, setReferralApplied] = useState(false);
 
   useEffect(() => {
     if (!isEdit) return;
@@ -195,12 +198,23 @@ export default function BookingForm() {
           <section className="card" style={{ padding: 24 }}>
             <span className="eyebrow" style={{ marginBottom: 12, display: 'inline-flex' }}>🎁 Referral</span>
             <p style={{ color: 'var(--ink-400)', fontSize: 13, margin: '0 0 14px' }}>
-              Enter a completed customer's referral code. The referrer earns 25 points (₹5); 50 points equal ₹10.
+              Enter a completed customer's referral code. Each use gives the owner 100 points (₹1,000). The new customer receives no discount.
             </p>
             <Field label="Referral Code (optional)">
               <input className="field-input" value={form.referralCodeUsed}
                 onChange={(e) => setPath('referralCodeUsed', e.target.value.toUpperCase())} placeholder="e.g., MAL-AB12CD34" />
             </Field>
+            <button type="button" className="btn btn-ghost btn-sm" style={{ marginTop: 12 }} onClick={async () => {
+              if (!form.referralCodeUsed) return showToast('Enter a referral code first', 'error');
+              try {
+                const res = await referralService.list();
+                const found = (res.data?.accounts || res.data || []).find((a) => a.referralCode === form.referralCodeUsed);
+                if (!found) throw new Error('Referral code not found');
+                if (!window.confirm(`Apply ${found.points || 0} points from ${found.customerName || 'this customer'} to this booking? This will be recorded only when you save.`)) return;
+                setReferralAccount(found); setReferralApplied(true); showToast('Referral points application confirmed', 'success');
+              } catch (err) { showToast(err.message, 'error'); }
+            }}>Validate referral code</button>
+            {referralApplied && referralAccount && <p style={{ fontSize: 12.5, color: 'var(--success)', margin: '10px 0 0' }}>Valid code. The owner earns 100 points when this booking is accepted; no points are deducted here.</p>}
           </section>
         )}
 

@@ -8,6 +8,7 @@ import BookingDetails from './pages/BookingDetails.jsx';
 import Settings from './pages/Settings.jsx';
 import Analytics from './pages/Analytics.jsx';
 import Gallery from './pages/Gallery.jsx';
+import Referrals from './pages/Referrals.jsx';
 
 export default function App() {
   return (
@@ -20,6 +21,7 @@ export default function App() {
         <Route path="/bookings/:id" element={<BookingDetails />} />
         <Route path="/analytics" element={<Analytics />} />
         <Route path="/gallery" element={<Gallery />} />
+        <Route path="/referrals" element={<Referrals />} />
         <Route path="/settings" element={<Settings />} />
       </Routes>
     </AdminLayout>

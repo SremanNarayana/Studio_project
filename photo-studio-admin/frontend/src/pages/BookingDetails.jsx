@@ -6,6 +6,7 @@ import StatusBadge from '../components/StatusBadge.jsx';
 import ProjectTimeline from '../components/ProjectTimeline.jsx';
 import Modal from '../components/Modal.jsx';
 import { useToast } from '../hooks/useToast.jsx';
+import referralService from '../services/referralService';
 
 const currency = (n) =>
   new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(n || 0);
@@ -29,6 +30,7 @@ export default function BookingDetails() {
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [approvalSaving, setApprovalSaving] = useState(false);
+  const [redeeming, setRedeeming] = useState(false);
 
   const load = useCallback(() => {
     setLoading(true);
@@ -89,6 +91,29 @@ export default function BookingDetails() {
     } finally {
       setApprovalSaving(false);
     }
+  };
+
+  const redeemReferralPoints = async () => {
+    if (!booking.referral?._id && !booking.referral?.id) {
+      showToast('Referral account details are unavailable for this booking', 'error');
+      return;
+    }
+    const available = Number(booking.referral.points || 0);
+    const raw = window.prompt(`Enter points to redeem (100 points = ₹1,000). Available: ${available}`, '100');
+    if (raw === null) return;
+    const points = Number(raw);
+    if (!Number.isInteger(points) || points <= 0 || points % 100 !== 0 || points > available) {
+      showToast('Enter a valid amount in 100-point blocks within the available balance', 'error');
+      return;
+    }
+    if (!window.confirm(`Deduct ${points} points and apply ₹${(points / 100) * 1000} to this booking?`)) return;
+    setRedeeming(true);
+    try {
+      const res = await referralService.redeem(booking.referral._id || booking.referral.id, booking._id, points);
+      setBooking(res.data?.booking || res.data);
+      showToast(`Redeemed ${points} points successfully`, 'success');
+    } catch (err) { showToast(err.message, 'error'); }
+    finally { setRedeeming(false); }
   };
 
   if (loading) return <Spinner label="Loading booking details..." />;
@@ -222,6 +247,7 @@ export default function BookingDetails() {
             <div className="card" style={{ padding: 24 }}>
               <SectionTitle icon="🎁" title="Referral Rewards" />
               {booking.referral ? (
+                <>
                 <InfoGrid
                   items={[
                     ['Your Referral Code', <span className="tracking-no">{booking.referral.referralCode}</span>],
@@ -230,6 +256,11 @@ export default function BookingDetails() {
                     ['Code Used on This Booking', booking.referralCodeUsed || '—'],
                   ]}
                 />
+                <button className="btn btn-gold btn-sm" style={{ marginTop: 16 }} disabled={redeeming || !booking.referral.points} onClick={redeemReferralPoints}>
+                  {redeeming ? 'Applying...' : 'Apply referral points'}
+                </button>
+                {(booking.referralPointsRedeemed || 0) > 0 && <p style={{ fontSize: 12.5, color: 'var(--ink-400)', margin: '10px 0 0' }}>Redeemed {booking.referralPointsRedeemed} points ({currency(booking.referralDiscountAmount)}).</p>}
+                </>
               ) : (
                 <p style={{ fontSize: 13, color: 'var(--ink-400)', margin: 0 }}>Referral code used: <span className="tracking-no">{booking.referralCodeUsed}</span></p>
               )}

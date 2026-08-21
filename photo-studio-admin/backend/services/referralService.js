@@ -4,8 +4,8 @@ const ReferralAccount = require('../models/ReferralAccount');
 const ReferralReward = require('../models/ReferralReward');
 const ApiError = require('../utils/ApiError');
 
-const REWARD_POINTS = 25;
-const RUPEES_PER_50_POINTS = 10;
+const REWARD_POINTS = 100;
+const RUPEES_PER_100_POINTS = 1000;
 
 function normalizePhone(value) {
   return String(value || '').replace(/\D/g, '');
@@ -48,8 +48,6 @@ async function validateReferral({ referralCode, phoneNumber }) {
 
   const account = await ReferralAccount.findOne({ referralCode: code });
   if (!account) throw new ApiError(400, 'Referral code is invalid');
-  const alreadyRedeemed = await ReferralReward.exists({ referralCode: code });
-  if (alreadyRedeemed) throw new ApiError(400, 'This referral code has already been used');
   if (account.phoneNumber === normalizePhone(phoneNumber)) {
     throw new ApiError(400, 'Customers cannot use their own referral code');
   }
@@ -71,10 +69,13 @@ async function grantReferralReward({ booking, referralCode, account: eligibleAcc
       referredBooking: booking._id,
       points: REWARD_POINTS,
       referralCode: code,
+      referredCustomerName: booking.personalDetails.fullName,
+      referredPhoneNumber: normalizePhone(booking.personalDetails.phoneNumber),
+      usedAt: new Date(),
     });
   } catch (error) {
     if (error?.code === 11000) {
-      throw new ApiError(400, 'This referral code has already been used');
+      throw new ApiError(400, 'This booking has already received a referral reward');
     }
     throw error;
   }
@@ -85,19 +86,45 @@ async function grantReferralReward({ booking, referralCode, account: eligibleAcc
 function accountSummary(account) {
   if (!account) return null;
   return {
+    _id: account._id,
     referralCode: account.referralCode,
     points: account.points,
-    rupeeValue: Math.floor(account.points / 50) * RUPEES_PER_50_POINTS,
+    rupeeValue: Math.floor(account.points / 100) * RUPEES_PER_100_POINTS,
   };
+}
+
+async function redeemPointsForBooking({ accountId, booking, points }) {
+  const requested = Number(points);
+  if (!Number.isInteger(requested) || requested <= 0 || requested % 100 !== 0) {
+    throw new ApiError(400, 'Points must be a positive multiple of 100');
+  }
+  const owner = await ReferralAccount.findById(accountId);
+  if (!owner || owner.phoneNumber !== normalizePhone(booking.personalDetails.phoneNumber)) {
+    throw new ApiError(403, 'Referral points can only be redeemed by their owner');
+  }
+  const account = await ReferralAccount.findOneAndUpdate(
+    { _id: accountId, points: { $gte: requested } },
+    { $inc: { points: -requested } },
+    { new: true }
+  );
+  if (!account) throw new ApiError(400, 'Insufficient referral points');
+  const discount = (requested / 100) * RUPEES_PER_100_POINTS;
+  booking.referralPointsRedeemed = (booking.referralPointsRedeemed || 0) + requested;
+  booking.referralDiscountAmount = (booking.referralDiscountAmount || 0) + discount;
+  booking.referralRedeemedFrom = account._id;
+  booking.payment.totalAmount = Math.max((booking.payment.totalAmount || 0) - discount, 0);
+  await booking.save();
+  return { account, discount, points: requested };
 }
 
 module.exports = {
   REWARD_POINTS,
-  RUPEES_PER_50_POINTS,
+  RUPEES_PER_100_POINTS,
   normalizePhone,
   normalizeCode,
   createReferralAccount,
   validateReferral,
   grantReferralReward,
   accountSummary,
+  redeemPointsForBooking,
 };

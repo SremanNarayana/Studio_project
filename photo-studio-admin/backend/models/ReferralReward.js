@@ -7,9 +7,10 @@ const referralRewardSchema = new mongoose.Schema(
     referrer: { type: mongoose.Schema.Types.ObjectId, ref: 'ReferralAccount', required: true, index: true },
     referredBooking: { type: mongoose.Schema.Types.ObjectId, ref: 'Booking', required: true, unique: true },
     points: { type: Number, required: true, default: 25 },
-    // A code is a one-time reward: this unique index also protects against
-    // simultaneous submissions attempting to redeem it twice.
-    referralCode: { type: String, required: true, unique: true, uppercase: true },
+    referralCode: { type: String, required: true, uppercase: true, index: true },
+    referredCustomerName: { type: String, required: true, trim: true },
+    referredPhoneNumber: { type: String, required: true, index: true },
+    usedAt: { type: Date, required: true, default: Date.now },
   },
   { timestamps: true }
 );
