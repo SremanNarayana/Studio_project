@@ -2,7 +2,7 @@ import { Hero } from "@/components/sections/Hero";
 import { About } from "@/components/sections/About";
 import { Services } from "@/components/sections/Services";
 import { Portfolio } from "@/components/sections/Portfolio";
-import { WhyChooseUs } from "@/components/sections/WhyChooseUs";
+import { GoogleReviews } from "@/components/sections/GoogleReviews";
 import { Process } from "@/components/sections/Process";
 import { LatestVideo } from "@/components/sections/LatestVideo";
 import { FAQ } from "@/components/sections/FAQ";
@@ -26,7 +26,7 @@ export default function HomePage() {
       <Services />
       <About />
       <Portfolio />
-      <WhyChooseUs />
+      <GoogleReviews />
       <Process />
       <LatestVideo />
       <FAQ />
