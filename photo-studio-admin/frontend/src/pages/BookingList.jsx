@@ -63,7 +63,9 @@ export default function BookingList() {
       await bookingService.remove(deleteTarget._id);
       showToast(`Booking ${deleteTarget.trackingNumber} deleted`, 'success');
       setDeleteTarget(null);
-      load(meta.page);
+      const remainingTotal = Math.max((meta.total || 1) - 1, 0);
+      const lastPage = Math.max(Math.ceil(remainingTotal / 10), 1);
+      load(Math.min(meta.page, lastPage));
     } catch (err) {
       showToast(err.message, 'error');
     } finally {
@@ -150,6 +152,7 @@ export default function BookingList() {
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13.5 }}>
               <thead>
                 <tr style={{ textAlign: 'left', color: 'var(--ink-400)', fontSize: 11, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+                  <th style={{ padding: '0 10px 12px' }}>No.</th>
                   <th style={{ padding: '0 10px 12px' }}>Tracking No.</th>
                   <th style={{ padding: '0 10px 12px' }}>Client Name</th>
                   <th style={{ padding: '0 10px 12px' }}>Event Date</th>
@@ -163,13 +166,14 @@ export default function BookingList() {
               <tbody>
                 {bookings.length === 0 && (
                   <tr>
-                    <td colSpan={8} style={{ padding: '40px 10px', textAlign: 'center', color: 'var(--ink-400)' }}>
+                    <td colSpan={9} style={{ padding: '40px 10px', textAlign: 'center', color: 'var(--ink-400)' }}>
                       No bookings match your search/filters.
                     </td>
                   </tr>
                 )}
-                {bookings.map((b) => (
+                {bookings.map((b, index) => (
                   <tr key={b._id} style={{ borderTop: '1px solid var(--line)' }}>
+                    <td style={{ padding: '12px 10px', color: 'var(--ink-400)' }}>{(meta.page - 1) * 10 + index + 1}</td>
                     <td style={{ padding: '12px 10px' }} className="tracking-no">{b.trackingNumber}</td>
                     <td style={{ padding: '12px 10px', fontWeight: 600 }}>
                       {b.personalDetails?.fullName}

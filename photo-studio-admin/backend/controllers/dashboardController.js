@@ -6,6 +6,11 @@ const { sendSuccess } = require('../utils/apiResponse');
 // @route   GET /api/dashboard
 const getDashboardData = asyncHandler(async (req, res) => {
   const now = new Date();
+  const dateFrom = req.query.dateFrom ? new Date(req.query.dateFrom) : null;
+  const dateTo = req.query.dateTo ? new Date(req.query.dateTo) : null;
+  const bookingFilter = dateFrom && dateTo && !Number.isNaN(dateFrom.getTime()) && !Number.isNaN(dateTo.getTime())
+    ? { createdAt: { $gte: dateFrom, $lt: dateTo } }
+    : {};
 
   const [
     totalBookings,
@@ -16,13 +21,19 @@ const getDashboardData = asyncHandler(async (req, res) => {
     pendingBalanceAgg,
     recentBookings,
   ] = await Promise.all([
-    Booking.countDocuments(),
-    Booking.countDocuments({ 'eventDetails.eventDate': { $gte: now } }),
-    Booking.countDocuments({ projectTimeline: { $elemMatch: { stageName: 'Delivery', status: 'Completed' } } }),
-    Booking.countDocuments({ projectTimeline: { $not: { $elemMatch: { stageName: 'Delivery', status: 'Completed' } } } }),
-    Booking.aggregate([{ $group: { _id: null, sum: { $sum: '$payment.advancePayment' } } }]),
-    Booking.aggregate([{ $group: { _id: null, sum: { $sum: '$payment.balancePayment' } } }]),
-    Booking.find()
+    Booking.countDocuments(bookingFilter),
+    Booking.countDocuments({ ...bookingFilter, 'eventDetails.eventDate': { $gte: now } }),
+    Booking.countDocuments({ ...bookingFilter, projectTimeline: { $elemMatch: { stageName: 'Delivery', status: 'Completed' } } }),
+    Booking.countDocuments({ ...bookingFilter, projectTimeline: { $not: { $elemMatch: { stageName: 'Delivery', status: 'Completed' } } } }),
+    Booking.aggregate([
+      { $match: bookingFilter },
+      { $group: { _id: null, sum: { $sum: '$payment.advancePayment' } } },
+    ]),
+    Booking.aggregate([
+      { $match: bookingFilter },
+      { $group: { _id: null, sum: { $sum: '$payment.balancePayment' } } },
+    ]),
+    Booking.find(bookingFilter)
       .sort({ createdAt: -1 })
       .limit(10)
       .select(

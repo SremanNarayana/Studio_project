@@ -12,12 +12,14 @@ const currency = (n) =>
 export default function Dashboard() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [period, setPeriod] = useState('all');
   const { showToast } = useToast();
 
   useEffect(() => {
     let mounted = true;
+    setLoading(true);
     dashboardService
-      .getSummary()
+      .getSummary(period === 'month' ? 'thisMonth' : undefined)
       .then((res) => mounted && setData(res.data))
       .catch((err) => showToast(err.message, 'error'))
       .finally(() => mounted && setLoading(false));
@@ -25,7 +27,7 @@ export default function Dashboard() {
       mounted = false;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [period]);
 
   if (loading) return <Spinner label="Loading dashboard..." />;
 
@@ -35,7 +37,29 @@ export default function Dashboard() {
     <div>
       <span className="eyebrow">◧ Live Overview</span>
       <h1 className="page-title" style={{ fontSize: 34 }}>Welcome back, Admin</h1>
-      <p className="page-subtitle">Every booking, shoot, and delivery in Malayaan Photography at a glance.</p>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
+        <p className="page-subtitle" style={{ margin: 0 }}>
+          {period === 'month' ? 'Bookings created this month at a glance.' : 'Every booking, shoot, and delivery in Malayaan Photography at a glance.'}
+        </p>
+        <div className="card" style={{ display: 'flex', gap: 6, padding: 5 }} aria-label="Dashboard time period">
+          <button
+            type="button"
+            className={`btn btn-sm ${period === 'all' ? 'btn-gold' : 'btn-ghost'}`}
+            aria-pressed={period === 'all'}
+            onClick={() => setPeriod('all')}
+          >
+            All time
+          </button>
+          <button
+            type="button"
+            className={`btn btn-sm ${period === 'month' ? 'btn-gold' : 'btn-ghost'}`}
+            aria-pressed={period === 'month'}
+            onClick={() => setPeriod('month')}
+          >
+            This month
+          </button>
+        </div>
+      </div>
 
       <div
         style={{
