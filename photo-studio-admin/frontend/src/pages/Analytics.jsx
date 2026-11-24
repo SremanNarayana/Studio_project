@@ -14,6 +14,7 @@ const compactCurrency = (value) => new Intl.NumberFormat('en-IN', {
 
 export default function Analytics() {
   const [months, setMonths] = useState(12);
+  const [period, setPeriod] = useState('all');
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const { showToast } = useToast();
@@ -21,12 +22,12 @@ export default function Analytics() {
   useEffect(() => {
     let mounted = true;
     setLoading(true);
-    analyticsService.get(months)
+    analyticsService.get(months, period)
       .then((res) => mounted && setData(res.data))
       .catch((err) => showToast(err.message, 'error'))
       .finally(() => mounted && setLoading(false));
     return () => { mounted = false; };
-  }, [months]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [months, period]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (loading && !data) return <Spinner label="Preparing analytics..." />;
   const summary = data?.summary || {};
@@ -37,16 +38,45 @@ export default function Analytics() {
         <div>
           <span className="eyebrow">↗ Studio Intelligence</span>
           <h1 className="page-title" style={{ fontSize: 34 }}>Data Analytics</h1>
-          <p className="page-subtitle">Booking demand, revenue movement, and production workload in one view.</p>
+          <p className="page-subtitle">
+            {period === 'month'
+              ? 'Booking demand, revenue, and production workload for this month.'
+              : 'Booking demand, revenue movement, and production workload in one view.'}
+          </p>
         </div>
-        <label>
-          <span className="field-label">Trend period</span>
-          <select className="field-select" value={months} onChange={(event) => setMonths(Number(event.target.value))}>
-            <option value={6}>Last 6 months</option>
-            <option value={12}>Last 12 months</option>
-            <option value={24}>Last 24 months</option>
-          </select>
-        </label>
+        <div style={{ display: 'flex', alignItems: 'flex-end', gap: 14, flexWrap: 'wrap' }}>
+          <div>
+            <span className="field-label">Activity period</span>
+            <div className="card" style={{ display: 'flex', gap: 6, padding: 5 }} aria-label="Analytics activity period">
+              <button
+                type="button"
+                className={`btn btn-sm ${period === 'all' ? 'btn-gold' : 'btn-ghost'}`}
+                aria-pressed={period === 'all'}
+                onClick={() => setPeriod('all')}
+              >
+                All time
+              </button>
+              <button
+                type="button"
+                className={`btn btn-sm ${period === 'month' ? 'btn-gold' : 'btn-ghost'}`}
+                aria-pressed={period === 'month'}
+                onClick={() => setPeriod('month')}
+              >
+                This month
+              </button>
+            </div>
+          </div>
+          {period === 'all' && (
+            <label>
+              <span className="field-label">Trend period</span>
+              <select className="field-select" value={months} onChange={(event) => setMonths(Number(event.target.value))}>
+                <option value={6}>Last 6 months</option>
+                <option value={12}>Last 12 months</option>
+                <option value={24}>Last 24 months</option>
+              </select>
+            </label>
+          )}
+        </div>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(185px, 1fr))', gap: 16, margin: '28px 0' }}>
@@ -60,7 +90,7 @@ export default function Analytics() {
       </div>
 
       <div className="analytics-primary-grid">
-        <Panel title="Booking trend" subtitle="Bookings created per month">
+        <Panel title="Booking trend" subtitle={period === 'month' ? 'Bookings created this month' : 'Bookings created per month'}>
           <MonthlyChart rows={data?.monthly || []} />
         </Panel>
         <Panel title="Payment position" subtitle="Count and contract value by status">
